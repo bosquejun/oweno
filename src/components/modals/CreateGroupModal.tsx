@@ -5,7 +5,7 @@ import { X, Plus, Users, Search, Check, Calendar } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useUIStore } from '../../store/useUIStore';
+import { useUIStore } from '../../contexts/UIContext';
 import { useCreateGroup, useUpdateGroup, useFriends } from '../../hooks/useSplits';
 import { Group, User } from '../../types';
 import { Input } from '../ui/Input';
@@ -15,6 +15,7 @@ interface CreateGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialGroup?: Group;
+  onSuccess?: () => void;
 }
 
 const GroupFormSchema = z.object({
@@ -26,7 +27,7 @@ const GroupFormSchema = z.object({
 
 type GroupFormData = z.infer<typeof GroupFormSchema>;
 
-export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, initialGroup }) => {
+export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, initialGroup, onSuccess }) => {
   const { currentUser } = useUIStore();
   const { data: friends = [] } = useFriends();
   const createGroupMutation = useCreateGroup();
@@ -128,6 +129,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
     try {
       if (isEditing) await updateGroupMutation.mutateAsync(finalData);
       else await createGroupMutation.mutateAsync(finalData);
+      onSuccess?.();
       onClose();
     } catch (e) {
       console.error("Group save error:", e);

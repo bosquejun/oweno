@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String  @id @default(cuid())
+  clerkId     String  @unique
+  displayName String
+  email       String  @unique
+  avatar      String?
+
+  // App Preferences
+  preferredCurrency String @default("PHP")
+  preferredLocale   String @default("en-PH")
+
+  // Relationships
+  groups       Group[]   @relation("GroupMembers")
+  expensesPaid Expense[] @relation("Payer")
+  splits       Split[]   @relation("UserSplits")
+
+  // Friendships (Self-relation)
+  friends          User[] @relation("UserFriends")
+  symmetricFriends User[] @relation("UserFriends")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Represents an expense group (e.g., "Siargao Trip")
+model Group {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  // Trip/Event duration
+  startDate DateTime?
+  endDate   DateTime?
+
+  // Relationships
+  members  User[]    @relation("GroupMembers")
+  expenses Expense[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Represents a specific bill or transaction
+model Expense {
+  id       String   @id @default(cuid())
+  title    String
+  amount   Float
+  category String
+  date     DateTime @default(now())
+
+  // How the bill is divided
+  splitType SplitType @default(EQUAL)
+
+  // Metadata for complex splits (e.g., share counts or percentages)
+  // Stored as JSON to preserve original user inputs
+  splitMetadata Json?
+
+  // Relationships
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId String
+
+  paidBy   User   @relation("Payer", fields: [paidById], references: [id])
+  paidById String
+
+  splits Split[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Represents an individual's share of an expense
+model Split {
+  id     String @id @default(cuid())
+  amount Float // The calculated final amount in currency
+
+  // Relationships
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId String
+
+  user   User   @relation("UserSplits", fields: [userId], references: [id])
+  userId String
+
+  @@unique([expenseId, userId])
+}
+
+enum SplitType {
+  EQUAL
+  EXACT
+  PERCENT
+  SHARES
+}

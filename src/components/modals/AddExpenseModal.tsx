@@ -5,7 +5,7 @@ import { X, Tag, Utensils, Plane, Zap, Film, ShoppingBag, ChevronDown, Check, Ho
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useUIStore } from '../../store/useUIStore';
+import { useUIStore } from '../../contexts/UIContext';
 import { useAddExpense, useUpdateExpense } from '../../hooks/useSplits';
 import { SplitType, Expense, Group, Split } from '../../types';
 import { formatCurrency, CURRENCY_SYMBOLS } from '../../utils/formatters';
@@ -16,6 +16,7 @@ interface AddExpenseModalProps {
   onClose: () => void;
   group: Group;
   initialExpense?: Expense;
+  onSuccess?: () => void;
 }
 
 const PRESET_CATEGORIES = [
@@ -36,7 +37,7 @@ const ExpenseFormSchema = z.object({
 
 type ExpenseFormData = z.infer<typeof ExpenseFormSchema>;
 
-export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClose, group, initialExpense }) => {
+export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClose, group, initialExpense, onSuccess }) => {
   const { currentUser, preferredCurrency, preferredLocale } = useUIStore();
   const addExpenseMutation = useAddExpense(group?.id || '');
   const updateExpenseMutation = useUpdateExpense(group?.id || '');
@@ -215,6 +216,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
     try {
       if (isEditing) await updateExpenseMutation.mutateAsync(finalExpense);
       else await addExpenseMutation.mutateAsync(finalExpense);
+      onSuccess?.();
       onClose();
     } catch (e) {
       console.error("Submission error:", e);

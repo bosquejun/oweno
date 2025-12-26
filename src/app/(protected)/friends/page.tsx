@@ -6,7 +6,7 @@ import { CheckCircle2, Heart, Loader2, Mail, Plus, Search, UserMinus } from 'luc
 import React, { useState } from 'react';
 
 export default function FriendsList() {
-  const { data: friends = [], isLoading } = useFriends();
+  const { data: friends = [], isLoading, refetch: refetchFriends } = useFriends();
   const removeFriendMutation = useRemoveFriend();
   const addFriendMutation = useAddFriend();
   
@@ -32,6 +32,7 @@ export default function FriendsList() {
     };
     
     await addFriendMutation.mutateAsync(newFriend);
+    await refetchFriends();
     setNewFriendEmail('');
     setIsAdding(false);
   };
@@ -115,7 +116,10 @@ export default function FriendsList() {
               </div>
               
               <button
-                onClick={() => removeFriendMutation.mutate(friend.id)}
+                onClick={async () => {
+                  await removeFriendMutation.mutate(friend.id);
+                  await refetchFriends();
+                }}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 rounded-xl font-black transition-all text-[10px] uppercase tracking-widest"
               >
                 <UserMinus size={14} />

@@ -8,7 +8,7 @@ import { CreateGroupModal } from '@/components/modals/CreateGroupModal';
 import { format } from 'date-fns';
 
 export default function GroupsList() {
-  const { data: groups = [], isLoading } = useGroups();
+  const { data: groups = [], isLoading, refetch: refetchGroups } = useGroups();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -110,7 +110,11 @@ export default function GroupsList() {
           </div>
         </div>
       </div>
-      <CreateGroupModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateGroupModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={refetchGroups}
+      />
     </>
   );
 }

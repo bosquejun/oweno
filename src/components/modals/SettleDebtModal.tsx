@@ -5,7 +5,7 @@ import { X, Wallet, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useUIStore } from '../../store/useUIStore';
+import { useUIStore } from '../../contexts/UIContext';
 import { useAddExpense } from '../../hooks/useSplits';
 import { Group, Debt, SplitType, Expense } from '../../types';
 import { formatCurrency, CURRENCY_SYMBOLS } from '../../utils/formatters';

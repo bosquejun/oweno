@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useUIStore } from '@/store/useUIStore';
+import { useUIStore } from '@/contexts/UIContext';
 import { useGroup, useExpenses, useFriends, useAddFriend } from '@/hooks/useSplits';
 import { ArrowLeft, Plus, Receipt, Sparkles, CreditCard, Utensils, Plane, Zap, Film, ShoppingBag, Tag, Loader2, Home, HeartPulse, MoreHorizontal, Edit2, UserPlus, Check, History, Share2, Link as LinkIcon, ArrowRight, Wallet, Search, Calendar } from 'lucide-react';
 import Link from 'next/link';
@@ -33,8 +33,8 @@ export default function GroupDetail() {
   const id = params.id as string;
   const { currentUser, preferredCurrency, preferredLocale } = useUIStore();
   const { data: group, isLoading: isLoadingGroup, isError: isGroupError } = useGroup(id || '');
-  const { data: expenses = [], isLoading: isLoadingExpenses } = useExpenses(id || '');
-  const { data: friends = [] } = useFriends();
+  const { data: expenses = [], isLoading: isLoadingExpenses, refetch: refetchExpenses } = useExpenses(id || '');
+  const { data: friends = [], refetch: refetchFriends } = useFriends();
   const addFriendMutation = useAddFriend();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -361,7 +361,12 @@ export default function GroupDetail() {
                     </div>
                     {member.id !== currentUser.id && (
                       <button
-                        onClick={() => !isFriend(member.id) && addFriendMutation.mutate(member)}
+                        onClick={async () => {
+                          if (!isFriend(member.id)) {
+                            await addFriendMutation.mutate(member);
+                            await refetchFriends();
+                          }
+                        }}
                         disabled={isFriend(member.id)}
                         className={`p-2 rounded-lg transition-all ${
                           isFriend(member.id) 
@@ -380,8 +385,24 @@ export default function GroupDetail() {
           </div>
         </div>
       </div>
-      <AddExpenseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} group={group} initialExpense={editingExpense} />
-      <CreateGroupModal isOpen={isEditGroupModalOpen} onClose={() => setIsEditGroupModalOpen(false)} initialGroup={group} />
+      <AddExpenseModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingExpense(undefined);
+        }} 
+        group={group} 
+        initialExpense={editingExpense}
+        onSuccess={refetchExpenses}
+      />
+      <CreateGroupModal 
+        isOpen={isEditGroupModalOpen} 
+        onClose={() => setIsEditGroupModalOpen(false)} 
+        initialGroup={group}
+        onSuccess={() => {
+          window.location.reload(); // Simple reload for now
+        }}
+      />
       <SettleDebtModal isOpen={isSettleModalOpen} onClose={() => setIsSettleModalOpen(false)} group={group} debt={selectedDebt} />
     </>
   );

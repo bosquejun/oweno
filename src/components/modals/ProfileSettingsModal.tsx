@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Globe, CreditCard, User, Check, Sparkles, Mail, AtSign, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useUIStore } from '../../store/useUIStore';
+import { useUIStore } from '../../contexts/UIContext';
 import { UserSchema } from '../../schemas';
 import { User as UserType } from '../../types';
 import { Input } from '../ui/Input';

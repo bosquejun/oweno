@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Mail, Lock, User, Sparkles, ArrowRight, Github, Chrome, Zap } from 'lucide-react';
-import { useUIStore } from '../../store/useUIStore';
+import { useUIStore } from '../../contexts/UIContext';
 import { Input } from '../ui/Input';
 
 interface AuthModalProps {

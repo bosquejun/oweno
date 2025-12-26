@@ -7,7 +7,7 @@ import { ArrowLeft, Loader2, Filter, ChevronDown, Tag, Utensils, Plane, Zap, Fil
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/utils/formatters';
-import { useUIStore } from '@/store/useUIStore';
+import { useUIStore } from '@/contexts/UIContext';
 
 const CATEGORY_STYLES: Record<string, { color: string, icon: any }> = {
   Dining: { color: 'text-emerald-600 bg-emerald-50', icon: Utensils },
