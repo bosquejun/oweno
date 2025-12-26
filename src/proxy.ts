@@ -4,13 +4,17 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher(["/", "/privacy", "/terms"]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
 const isApiRoute = createRouteMatcher(["/api(.*)"]);
+const isInviteRoute = createRouteMatcher(["/invite(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
 	const { isAuthenticated, redirectToSignIn, sessionClaims } = await auth();
+	const dashboardUrl = new URL(`/dashboard`, req.url);
 
 	const isPublic = isPublicRoute(req);
 	const isApi = isApiRoute(req);
 	const isOnboarding = isOnboardingRoute(req);
+	const isInvite = isInviteRoute(req);
+
 
 	// Allow API routes to proceed without onboarding checks
 	if (isApi) {
@@ -37,6 +41,26 @@ export default clerkMiddleware(async (auth, req) => {
 	) {
 		const onboardingUrl = new URL("/onboarding", req.url);
 		return NextResponse.redirect(onboardingUrl);
+	}
+
+	// Handle invite token logic for authenticated users who completed onboarding
+	if (isAuthenticated && sessionClaims?.metadata?.onboardingComplete) {
+		const {inviteToken} = sessionClaims?.metadata;
+
+		// Case 1: User has inviteToken in metadata and is NOT on invite page -> redirect to invite page
+		if (inviteToken && !isInvite) {
+			const inviteUrl = new URL(`/invite/${inviteToken}`, req.url);
+			return NextResponse.redirect(inviteUrl);
+		} 
+
+		// Case 2: User has NO inviteToken in metadata but is on an invite page -> redirect to dashboard
+		if (!inviteToken && isInvite) {
+			return NextResponse.redirect(dashboardUrl);
+		}
+
+		// Case 3: User has inviteToken and is on invite page -> allow access
+		// Case 4: User has NO inviteToken and is NOT on invite page -> allow access
+		// (Both cases fall through to NextResponse.next())
 	}
 
 	return NextResponse.next();

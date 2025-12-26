@@ -94,7 +94,7 @@ export const Layout: React.FC<{
 						<div className='relative shrink-0'>
 							<Image
 								unoptimized
-								src={user?.avatar || ""}
+								src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.clerkId}&backgroundColor=b6e3f4`}
 								width={48}
 								height={48}
 								alt={user?.displayName || ""}
@@ -171,8 +171,8 @@ export const Layout: React.FC<{
 					} active:scale-95`}
 				>
 					<Image
-						src={user?.avatar || ""}
-						width={36}
+								src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.clerkId}&backgroundColor=b6e3f4`}
+								width={36}
 						height={36}
 						className='w-full h-full object-cover'
 						alt={user?.displayName || ""}

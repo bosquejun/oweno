@@ -260,65 +260,81 @@ export default function SettingsPage({ user }: { user: User }) {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
 					{/* Currency Selection */}
 					<section className='bg-white rounded-[3rem] p-8 md:p-10 border border-slate-100 shadow-sm'>
-						<div className='flex items-center gap-3 mb-6'>
-							<div className='w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center'>
+						<div className='flex items-center gap-3 mb-8'>
+							<div className='w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl flex items-center justify-center shadow-sm'>
 								<CreditCard
-									size={20}
+									size={24}
 									className='text-blue-600'
 								/>
 							</div>
 							<div>
-								<h3 className='text-lg font-black text-slate-900 tracking-tight'>
-									Currency
+								<h3 className='text-xl font-black text-slate-900 tracking-tight'>
+									Preferred Currency
 								</h3>
-								<p className='text-xs text-slate-500 font-medium'>
-									Select your preferred currency
+								<p className='text-xs text-slate-500 font-medium mt-0.5'>
+									Choose how amounts are displayed
 								</p>
 							</div>
 						</div>
-						<div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
-							{CURRENCIES.map((c) => (
-								<button
-									key={c.code}
-									type='button'
-									onClick={() =>
-										setValue("preferredCurrency", c.code, {
-											shouldDirty: true,
-										})
-									}
-									className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-										preferredCurrency === c.code
-											? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-100 scale-105"
-											: "bg-white border-slate-200 text-slate-400 hover:border-emerald-300 hover:bg-emerald-50/50"
-									}`}
-								>
-									<span
-										className={`text-2xl font-black ${
-											preferredCurrency === c.code
-												? "text-white"
-												: "text-slate-900"
+						<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+							{CURRENCIES.map((c) => {
+								const isSelected = preferredCurrency === c.code;
+								return (
+									<button
+										key={c.code}
+										type='button'
+										onClick={() =>
+											setValue("preferredCurrency", c.code, {
+												shouldDirty: true,
+											})
+										}
+										className={`group relative flex flex-col items-start gap-3 p-5 rounded-2xl border-2 transition-all duration-200 ${
+											isSelected
+												? "bg-gradient-to-br from-emerald-600 to-emerald-700 border-emerald-600 text-white shadow-xl shadow-emerald-100/50 scale-[1.02]"
+												: "bg-white border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/30 hover:shadow-md"
 										}`}
 									>
-										{c.symbol}
-									</span>
-									<span
-										className={`text-[10px] font-black uppercase tracking-tight ${
-											preferredCurrency === c.code
-												? "text-white/90"
-												: "text-slate-600"
-										}`}
-									>
-										{c.code}
-									</span>
-									{preferredCurrency === c.code && (
-										<Check
-											size={14}
-											className='text-white mt-1'
-											strokeWidth={3}
-										/>
-									)}
-								</button>
-							))}
+										{/* Selection Indicator */}
+										{isSelected && (
+											<div className='absolute -top-2 -right-2 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg'>
+												<Check size={12} className='text-white' strokeWidth={3} />
+											</div>
+										)}
+										
+										{/* Currency Symbol */}
+										<div className={`flex items-center gap-3 w-full ${
+											isSelected ? 'text-white' : 'text-slate-900'
+										}`}>
+											<div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-black ${
+												isSelected 
+													? 'bg-white/20 backdrop-blur-sm' 
+													: 'bg-slate-100 group-hover:bg-emerald-100'
+											} transition-colors`}>
+												{c.symbol}
+											</div>
+											<div className='flex-1 min-w-0'>
+												<div className='flex items-center gap-2'>
+													<span className={`text-lg font-black ${
+														isSelected ? 'text-white' : 'text-slate-900'
+													}`}>
+														{c.code}
+													</span>
+												</div>
+												<p className={`text-xs font-medium mt-0.5 truncate ${
+													isSelected ? 'text-white/80' : 'text-slate-500'
+												}`}>
+													{c.label}
+												</p>
+											</div>
+										</div>
+										
+										{/* Hover effect indicator */}
+										{!isSelected && (
+											<div className='absolute inset-0 rounded-2xl bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors pointer-events-none'></div>
+										)}
+									</button>
+								);
+							})}
 						</div>
 					</section>
 

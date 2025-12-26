@@ -6,6 +6,9 @@ declare global {
 		metadata?: {
 			onboardingComplete?: boolean;
 			displayName?: string;
+			inviteToken?: string;
+			invitedBy?: string;
+			groupId?: string | null;
 		};
 		// You can also define other custom claims if needed
 		// 'privateMetadata' and 'unsafeMetadata' are generally handled server-side,

@@ -22,3 +22,17 @@ export type Split = z.infer<typeof SplitSchema>;
 export type Expense = z.infer<typeof ExpenseSchema>;
 export type Debt = z.infer<typeof DebtSchema>;
 export type Balance = z.infer<typeof BalanceSchema>;
+
+
+
+export type PaginationParams = {
+	page: number;
+	limit: number;
+};
+
+export type PaginationResponse<T> = {
+	data: T[];
+	total: number;
+	page: number;
+	limit: number;
+};

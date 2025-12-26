@@ -25,13 +25,13 @@ model User {
   preferredLocale   String @default("en-PH")
 
   // Relationships
-  groups       Group[]   @relation("GroupMembers")
-  expensesPaid Expense[] @relation("Payer")
-  splits       Split[]   @relation("UserSplits")
-
-  // Friendships (Self-relation)
-  friends          User[] @relation("UserFriends")
-  symmetricFriends User[] @relation("UserFriends")
+  groups              Group[]   @relation("GroupMembers")
+  expensesPaid        Expense[] @relation("Payer")
+  splits              Split[]   @relation("UserSplits")
+  invitesSent         Invite[]  @relation("Inviter")
+  invitesReceived     Invite[]  @relation("Invitee")
+  friendshipsAsUser   Friend[]  @relation("UserFriendships")
+  friendshipsAsFriend Friend[]  @relation("FriendFriendships")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,6 +50,7 @@ model Group {
   // Relationships
   members  User[]    @relation("GroupMembers")
   expenses Expense[]
+  invites  Invite[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,4 +104,60 @@ enum SplitType {
   EXACT
   PERCENT
   SHARES
+}
+
+/// Represents an invitation to join a group or the app
+model Invite {
+  id     String       @id @default(cuid())
+  email  String
+  token  String       @unique @default(cuid())
+  status InviteStatus @default(PENDING)
+
+  // Optional: Link invite to a specific group
+  groupId String?
+  group   Group?  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  // Who sent the invite
+  inviterId String
+  inviter   User   @relation("Inviter", fields: [inviterId], references: [id])
+
+  // Who accepted (if accepted)
+  inviteeId String?
+  invitee   User?   @relation("Invitee", fields: [inviteeId], references: [id])
+
+  // Clerk invitation ID (if using Clerk's invite system)
+  clerkInvitationId String?
+
+  expiresAt  DateTime?
+  acceptedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([token])
+  @@index([status])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+/// Represents a friendship between two users
+model Friend {
+  id       String @id @default(cuid())
+  userId   String
+  friendId String
+  user     User   @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
+  friend   User   @relation("FriendFriendships", fields: [friendId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
 }

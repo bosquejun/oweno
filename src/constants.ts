@@ -18,9 +18,12 @@ export const TTL = {
 
 export const CACHE_TAGS = {
 	USER: (userId: string) => `user-${userId}`,
+	FRIENDS: (userId: string) => `friends-${userId}`,
 	GROUP: (groupId: string) => `group-${groupId}`,
 	EXPENSE: (expenseId: string) => `expense-${expenseId}`,
 	SPLIT: (splitId: string) => `split-${splitId}`,
 };
 
 export const USER_TTL = TTL.FIFTEEN_MINUTES;
+export const FRIENDS_TTL = TTL.ONE_DAY;
+export const GROUPS_TTL = TTL.ONE_DAY;

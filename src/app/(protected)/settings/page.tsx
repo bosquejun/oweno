@@ -19,6 +19,9 @@ export const ClientPage = dynamic(() => import("./page.client"), {
 export default async function SettingsPage() {
 	const { userId } = await auth();
 
+
+	console.log(userId)
+
 	if (!userId) {
 		return <Loading />;
 	}

@@ -1,20 +1,27 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { X, Plus, Users, Search, Check, Calendar } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { Group, User } from '@/generated/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useUIStore } from '../../contexts/UIContext';
-import { useCreateGroup, useUpdateGroup, useFriends } from '../../hooks/useSplits';
-import { Group, User } from '../../types';
-import { Input } from '../ui/Input';
 import { format } from 'date-fns';
+import { Calendar, Check, Plus, Search, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { useCreateGroup, useUpdateGroup } from '../../hooks/useSplits';
+import { Input } from '../ui/Input';
+
+// Extended Group type that includes members
+type GroupWithMembers = Group & {
+  members?: User[];
+};
+
 
 interface CreateGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialGroup?: Group;
+  initialGroup?: GroupWithMembers;
+  user: User;
+  friends: User[];
   onSuccess?: () => void;
 }
 
@@ -27,9 +34,7 @@ const GroupFormSchema = z.object({
 
 type GroupFormData = z.infer<typeof GroupFormSchema>;
 
-export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, initialGroup, onSuccess }) => {
-  const { currentUser } = useUIStore();
-  const { data: friends = [] } = useFriends();
+export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, initialGroup, user, friends }) => {
   const createGroupMutation = useCreateGroup();
   const updateGroupMutation = useUpdateGroup();
   const isEditing = !!initialGroup;
@@ -57,7 +62,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
           startDate: initialGroup.startDate ? format(initialGroup.startDate, 'yyyy-MM-dd') : '',
           endDate: initialGroup.endDate ? format(initialGroup.endDate, 'yyyy-MM-dd') : '',
         });
-        setMembers(initialGroup.members);
+        setMembers((initialGroup?.members as User[]) || []);
       } else {
         reset({
           name: '',
@@ -65,11 +70,11 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
           startDate: '',
           endDate: '',
         });
-        setMembers([currentUser]);
+        setMembers([user]);
       }
       setMemberSearchQuery('');
     }
-  }, [isOpen, initialGroup, currentUser, reset]);
+  }, [isOpen, initialGroup, user, reset]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -83,7 +88,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
 
   if (!isOpen) return null;
 
-  const handleAddMemberByEmail = () => {
+  const handleAddMemberByEmail = async () => {
     const email = memberSearchQuery.trim();
     if (!email || !email.includes('@')) return;
     
@@ -92,21 +97,48 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
       return;
     }
 
-    const newMember: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: email.split('@')[0],
-      email: email,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-    };
-    setMembers(prev => [...prev, newMember]);
-    setMemberSearchQuery('');
-    setIsFriendPickerOpen(false);
+    // For existing groups, send invite; for new groups, add as pending member
+    if (isEditing && initialGroup) {
+      // Send invite for existing group
+      try {
+        const response = await fetch('/api/invites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, groupId: initialGroup.id }),
+        });
+        if (response.ok) {
+          // Add as pending member for UI
+          const newMember = {
+            id: `pending_${email}`,
+            displayName: email.split('@')[0],
+            email: email,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+          } as User;
+          setMembers(prev => [...prev, newMember]);
+          setMemberSearchQuery('');
+          setIsFriendPickerOpen(false);
+        }
+      } catch (error) {
+        console.error('Error sending invite:', error);
+      }
+    } else {
+      // For new groups, add as pending member (will be invited after group creation)
+      const newMember = {
+        id: `pending_${email}`,
+        displayName: email.split('@')[0],
+        email: email,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+      } as User;
+      setMembers(prev => [...prev, newMember]);
+      setMemberSearchQuery('');
+      setIsFriendPickerOpen(false);
+    }
   };
 
   const toggleMemberSelection = (user: User) => {
     setMembers(prev => {
       if (prev.some(m => m.id === user.id)) {
-        if (user.id === currentUser.id) return prev; // Cannot remove self
+        if (user.id === user.id) return prev; // Cannot remove self
         return prev.filter(m => m.id !== user.id);
       }
       return [...prev, user];
@@ -116,30 +148,61 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
   const onFormSubmit = async (formData: GroupFormData) => {
     if (members.length < 1) return;
 
-    const finalData: Group = {
+    // Separate existing members from pending invites (emails without user IDs)
+    const existingMembers = members.filter(m => !m.id.startsWith('pending_')) satisfies User[];
+    const pendingInvites = members.filter(m => m.id.startsWith('pending_')) satisfies User[];
+
+    const finalData = {
       id: initialGroup?.id || Math.random().toString(36).substr(2, 9),
       name: formData.name,
-      description: formData.description,
-      members,
+      description: formData.description || null,
+      members: existingMembers,
       createdAt: initialGroup?.createdAt || new Date(),
-      startDate: formData.startDate ? new Date(formData.startDate) : undefined,
-      endDate: formData.endDate ? new Date(formData.endDate) : undefined,
-    };
+      updatedAt: initialGroup?.updatedAt || new Date(),
+      startDate: formData.startDate ? new Date(formData.startDate) : null,
+      endDate: formData.endDate ? new Date(formData.endDate) : null,
+    } satisfies GroupWithMembers;
 
     try {
-      if (isEditing) await updateGroupMutation.mutateAsync(finalData);
-      else await createGroupMutation.mutateAsync(finalData);
-      onSuccess?.();
+      let groupId: string;
+      if (isEditing) {
+        await updateGroupMutation.mutateAsync(finalData);
+        groupId = finalData.id;
+      } else {
+        const createdGroup = await createGroupMutation.mutateAsync(finalData);
+        groupId = createdGroup.id;
+      }
+
+      // Send invites to pending members
+      if (pendingInvites.length > 0) {
+        await Promise.all(
+          pendingInvites.map(async (member) => {
+            try {
+              await fetch('/api/invites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  email: member.email, 
+                  groupId 
+                }),
+              });
+            } catch (error) {
+              console.error(`Error inviting ${member.email}:`, error);
+            }
+          })
+        );
+      }
+
       onClose();
     } catch (e) {
       console.error("Group save error:", e);
     }
   };
 
-  const filteredFriends = friends.filter(f => 
-    f.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) || 
+  const filteredFriends = friends?.filter(f => 
+    (f.displayName || f.email).toLowerCase().includes(memberSearchQuery.toLowerCase()) || 
     f.email.toLowerCase().includes(memberSearchQuery.toLowerCase())
-  );
+  ) || [];
 
   const isEmailInput = memberSearchQuery.includes('@');
 
@@ -201,9 +264,9 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
               <div className="flex flex-wrap gap-2 mb-4">
                 {members.map((m) => (
                   <div key={m.id} className="flex items-center gap-2.5 bg-emerald-50/80 px-4 py-2 rounded-xl text-[10px] font-black text-emerald-700 border border-emerald-100 shadow-sm animate-in zoom-in-95">
-                    <img src={m.avatar} className="w-5 h-5 rounded-md" alt="" />
-                    <span className="truncate max-w-[120px]">{m.id === currentUser.id ? 'You' : m.name}</span>
-                    {m.id !== currentUser.id && (
+                    <img src={m.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.id}`} className="w-5 h-5 rounded-md" alt="" />
+                    <span className="truncate max-w-[120px]">{m.id === user.id ? 'You' : m.displayName}</span>
+                    {m.id !== user.id && (
                       <button type="button" onClick={() => setMembers(members.filter(mem => mem.id !== m.id))} className="text-emerald-300 hover:text-rose-500 transition-colors">
                         <X size={14} strokeWidth={3} />
                       </button>
@@ -253,9 +316,9 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
                             className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${isSelected ? 'bg-emerald-50 text-emerald-700' : 'hover:bg-slate-50'}`}
                           >
                             <div className="flex items-center gap-3">
-                              <img src={f.avatar} className="w-8 h-8 rounded-lg" alt="" />
+                              <img src={f.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${f.id}`} className="w-8 h-8 rounded-lg" alt="" />
                               <div className="text-left">
-                                <p className="text-xs font-black">{f.name}</p>
+                                <p className="text-xs font-black">{f.displayName}</p>
                                 <p className="text-[8px] text-slate-400 font-bold uppercase truncate">{f.email}</p>
                               </div>
                             </div>

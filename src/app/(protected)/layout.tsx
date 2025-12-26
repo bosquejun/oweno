@@ -27,6 +27,7 @@ export default async function ProtectedLayout({
 
 	const user = await getCachedUserById(userId);
 
+
 	return (
 		<Suspense fallback={<Loading />}>
 			<Layout user={user}>{children}</Layout>

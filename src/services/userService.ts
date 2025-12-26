@@ -45,3 +45,4 @@ export const upsertUser = async (
 
 	revalidateTag(CACHE_TAGS.USER(userId), {});
 };
+
