@@ -1,22 +1,26 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { X, Tag, Utensils, Plane, Zap, Film, ShoppingBag, ChevronDown, Check, Home, HeartPulse, MoreHorizontal, Search, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { DetailedExpense } from '@/app/(protected)/groups/[id]/page.client';
+import { Group, User } from '@/generated/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, Calendar, Check, CheckCircle2, ChevronDown, Film, HeartPulse, Home, MoreHorizontal, Plane, Search, ShoppingBag, Tag, Utensils, X, Zap } from 'lucide-react';
+import Image from 'next/image';
+import { format } from 'date-fns';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useUIStore } from '../../contexts/UIContext';
-import { useAddExpense, useUpdateExpense } from '../../hooks/useSplits';
-import { SplitType, Expense, Group, Split } from '../../types';
-import { formatCurrency, CURRENCY_SYMBOLS } from '../../utils/formatters';
+import { useUpdateExpense } from '../../hooks/useSplits';
+import { Expense, Split, SplitType } from '../../types';
+import { CURRENCY_SYMBOLS, formatCurrency } from '../../utils/formatters';
 import { Input } from '../ui/Input';
 
 interface AddExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  group: Group;
-  initialExpense?: Expense;
+  group: Group & {members: User[]};
+  initialExpense?: DetailedExpense;
   onSuccess?: () => void;
+  user: User;
 }
 
 const PRESET_CATEGORIES = [
@@ -33,17 +37,16 @@ const PRESET_CATEGORIES = [
 const ExpenseFormSchema = z.object({
   title: z.string().min(3, "Bill title must be at least 3 characters long"),
   amount: z.number().positive("Amount must be greater than zero"),
+  date: z.string().min(1, "Date is required"),
 });
 
 type ExpenseFormData = z.infer<typeof ExpenseFormSchema>;
 
-export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClose, group, initialExpense, onSuccess }) => {
-  const { currentUser, preferredCurrency, preferredLocale } = useUIStore();
-  const addExpenseMutation = useAddExpense(group?.id || '');
+export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClose, group, initialExpense, onSuccess, user }) => {
   const updateExpenseMutation = useUpdateExpense(group?.id || '');
   const isEditing = !!initialExpense;
 
-  const [paidBy, setPaidBy] = useState(currentUser?.id || '');
+  const [paidBy, setPaidBy] = useState(user?.id || '');
   const [splitType, setSplitType] = useState<SplitType>(SplitType.EQUAL);
   const [category, setCategory] = useState('Dining');
   const [involvedUserIds, setInvolvedUserIds] = useState<Set<string>>(new Set());
@@ -79,13 +82,14 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
         reset({
           title: initialExpense.title,
           amount: initialExpense.amount,
+          date: format(new Date(initialExpense.date), 'yyyy-MM-dd'),
         });
         setPaidBy(initialExpense.paidById);
         setSplitType(initialExpense.splitType);
         setCategory(initialExpense.category);
         const involved = new Set<string>(initialExpense.splits.map(s => s.userId));
         setInvolvedUserIds(involved);
-        const metadata = initialExpense.splitMetadata || {};
+        const metadata = initialExpense.splitMetadata as Record<string, string> || {};
         const exacts: Record<string, string> = {};
         const percs: Record<string, string> = {};
         const shs: Record<string, string> = {};
@@ -101,8 +105,9 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
         reset({
           title: '',
           amount: 0,
+          date: format(new Date(), 'yyyy-MM-dd'),
         });
-        setPaidBy(currentUser?.id || '');
+        setPaidBy(user?.id || '');
         setSplitType(SplitType.EQUAL);
         setCategory('Dining');
         setInvolvedUserIds(new Set(group.members.map(m => m.id)));
@@ -115,7 +120,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
       setUserSearchQuery('');
       clearErrors();
     }
-  }, [isOpen, initialExpense, group, currentUser, reset, clearErrors]);
+  }, [isOpen, initialExpense, group, user, reset, clearErrors]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -167,7 +172,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
       }));
     } else if (splitType === SplitType.EXACT) {
       if (isMismatch) {
-        setError('root', { message: `Mismatch: Total is ${formatCurrency(numAmount, preferredCurrency, preferredLocale)}` });
+        setError('root', { message: `Mismatch: Total is ${formatCurrency(numAmount, user.preferredCurrency, user.preferredLocale)}` });
         return;
       }
       splits = involved.map(m => {
@@ -206,7 +211,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
       title: formData.title,
       amount: numAmount,
       paidById: paidBy,
-      date: initialExpense?.date || new Date(),
+      date: new Date(formData.date),
       splitType,
       splits,
       category,
@@ -214,8 +219,26 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
     };
 
     try {
-      if (isEditing) await updateExpenseMutation.mutateAsync(finalExpense);
-      else await addExpenseMutation.mutateAsync(finalExpense);
+      if (isEditing) {
+        const response = await fetch(`/api/expenses/${initialExpense?.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(finalExpense),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update expense');
+        }
+      }
+      else {
+        const response = await fetch('/api/expenses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(finalExpense),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to create expense');
+        }
+      }
       onSuccess?.();
       onClose();
     } catch (e) {
@@ -242,7 +265,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
   };
 
   const filteredMembers = group.members.filter(m => 
-    m.name.toLowerCase().includes(userSearchQuery.toLowerCase()) || 
+    m.displayName.toLowerCase().includes(userSearchQuery.toLowerCase()) || 
     m.email.toLowerCase().includes(userSearchQuery.toLowerCase())
   );
 
@@ -280,7 +303,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
                   {...register('title')}
                 />
                 <Input
-                  prefix={CURRENCY_SYMBOLS[preferredCurrency] || '₱'}
+                  prefix={CURRENCY_SYMBOLS[user.preferredCurrency] || '₱'}
                   type="number"
                   step="0.01"
                   placeholder="0.00"
@@ -288,6 +311,13 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
                   {...register('amount', { valueAsNumber: true })}
                 />
               </div>
+              <Input
+                icon={Calendar}
+                type="date"
+                label="Date"
+                error={errors.date?.message}
+                {...register('date')}
+              />
             </section>
 
             <section className="space-y-4">
@@ -313,10 +343,10 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
               <div className="relative" ref={pickerRef}>
                 <button type="button" onClick={() => setIsUserPickerOpen(!isUserPickerOpen)} className="w-full flex items-center justify-between p-4 bg-slate-900 text-white rounded-[1.5rem] shadow-xl active:scale-[0.98] transition-all">
                   <div className="flex items-center gap-3.5">
-                    <img src={selectedUser?.avatar} className="w-9 h-9 rounded-xl border-2 border-white/20" alt="" />
+                    <Image unoptimized width={36} height={36} src={selectedUser?.avatar || ''} className="w-9 h-9 rounded-xl border-2 border-white/20" alt={selectedUser?.displayName} />
                     <div className="text-left">
                       <p className="text-[11px] font-black uppercase tracking-widest text-white/50 mb-0.5">Settled By</p>
-                      <p className="text-sm font-black">{paidBy === currentUser.id ? 'You' : selectedUser?.name}</p>
+                      <p className="text-sm font-black">{paidBy === user.id ? 'You' : selectedUser?.displayName}</p>
                     </div>
                   </div>
                   <ChevronDown size={18} className={`text-white/40 transition-transform ${isUserPickerOpen ? 'rotate-180' : ''}`} />
@@ -340,8 +370,8 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
                       {filteredMembers.length > 0 ? filteredMembers.map((m) => (
                         <button key={m.id} type="button" onClick={() => { setPaidBy(m.id); setIsUserPickerOpen(false); }} className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${paidBy === m.id ? 'bg-emerald-50 text-emerald-700' : 'hover:bg-slate-50'}`}>
                           <div className="flex items-center gap-3">
-                            <img src={m.avatar} className="w-8 h-8 rounded-lg" alt="" />
-                            <span className="text-sm font-black">{m.id === currentUser.id ? 'You' : m.name}</span>
+                            <Image unoptimized width={32} height={32} src={m.avatar || ''} className="w-8 h-8 rounded-lg" alt={m.displayName} />
+                            <span className="text-sm font-black">{m.id === user.id ? 'You' : m.displayName}</span>
                           </div>
                           {paidBy === m.id && <Check size={18} strokeWidth={3} />}
                         </button>
@@ -382,7 +412,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
                        </p>
                        <p className="text-xs font-bold mt-1">
                          {splitType === SplitType.EXACT 
-                           ? `Sum: ${formatCurrency(totals.exactSum, preferredCurrency, preferredLocale)} / ${formatCurrency(numAmount, preferredCurrency, preferredLocale)}`
+                           ? `Sum: ${formatCurrency(totals.exactSum, user.preferredCurrency, user.preferredLocale)} / ${formatCurrency(numAmount, user.preferredCurrency, user.preferredLocale)}`
                            : `Total: ${totals.percentSum.toFixed(1)}% / 100%`}
                        </p>
                      </div>
@@ -407,12 +437,12 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
                   return (
                     <div key={member.id} className={`flex items-center gap-4 p-4 rounded-[1.5rem] border-2 transition-all ${isInvolved ? 'bg-white border-emerald-100 shadow-sm' : 'bg-slate-50/30 border-transparent opacity-40'}`}>
                       <button type="button" onClick={() => toggleUserInvolvement(member.id)} className="shrink-0 relative">
-                        <img src={member.avatar} className={`w-10 h-10 rounded-xl border-2 transition-all ${isInvolved ? 'border-emerald-500 scale-105 shadow-md shadow-emerald-50' : 'border-slate-200'}`} alt="" />
+                        <Image unoptimized width={40} height={40} src={member.avatar || ''} className={`w-10 h-10 rounded-xl border-2 transition-all ${isInvolved ? 'border-emerald-500 scale-105 shadow-md shadow-emerald-50' : 'border-slate-200'}`} alt={member.displayName} />
                         {isInvolved && <div className="absolute -top-1 -right-1 bg-emerald-500 text-white rounded-full p-0.5"><Check size={8} strokeWidth={4} /></div>}
                       </button>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-black text-slate-900 truncate">{member.name}</p>
-                        {isInvolved && <p className="text-[10px] font-bold text-emerald-600">{formatCurrency(calculatedAmount, preferredCurrency, preferredLocale)}</p>}
+                        <p className="text-xs font-black text-slate-900 truncate">{member.displayName}</p>
+                        {isInvolved && <p className="text-[10px] font-bold text-emerald-600">{formatCurrency(calculatedAmount, user.preferredCurrency, user.preferredLocale)}</p>}
                       </div>
                       {isInvolved && splitType !== SplitType.EQUAL && (
                         <div className="relative">

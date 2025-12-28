@@ -1,4 +1,6 @@
-import { getInviteByToken } from "@/services/inviteService";
+import { CACHE_TAGS } from "@/constants";
+import { getCachedInviteByToken } from "@/services/inviteService";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -7,7 +9,7 @@ export async function GET(
 ) {
 	try {
 		const { token } = await params;
-		const invite = await getInviteByToken(token);
+		const invite = await getCachedInviteByToken(token);
 
 		if (!invite) {
 			return NextResponse.json(
@@ -15,6 +17,8 @@ export async function GET(
 				{ status: 404 }
 			);
 		}
+
+		revalidateTag(CACHE_TAGS.INVITE(token), {});
 
 		// Don't expose sensitive data
 		return NextResponse.json({

@@ -2,10 +2,10 @@
 
 import { CreateGroupModal } from '@/components/modals/CreateGroupModal';
 import { Group, User } from '@/generated/prisma/client';
-import { GroupCreateInput } from '@/generated/prisma/models';
 import { format } from 'date-fns';
 import { Calendar, ChevronRight, Heart, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 
@@ -13,19 +13,10 @@ type GroupWithMembers = Group & {
   members: User[];
 };
 
-export default function GroupsList({groups = []}: {groups: GroupWithMembers[], user: User, friends: User[]}) {
+export default function GroupsList({groups = [], friends = [], user}: {groups: GroupWithMembers[], user: User, friends: User[]}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-
-  const handleCreateGroup = async (group: GroupCreateInput) => {
-    const response = await fetch('/api/groups', {
-      method: 'POST',
-      body: JSON.stringify(group),
-    });
-    setIsModalOpen(false);
-  }
-
+  const router = useRouter();
 
   return (
     <>
@@ -112,7 +103,12 @@ export default function GroupsList({groups = []}: {groups: GroupWithMembers[], u
           </div>
         </div>
       </div>
-      <CreateGroupModal 
+      <CreateGroupModal
+      onSuccess={(groupId)=>{
+        router.push(`/groups/${groupId}`);
+      }}
+      friends={friends}
+      user={user}
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
       />

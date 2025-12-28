@@ -1,6 +1,8 @@
+import { CACHE_TAGS } from "@/constants";
 import { cancelInvite, resendInvite } from "@/services/inviteService";
 import { getUserById } from "@/services/userService";
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
@@ -26,7 +28,7 @@ export async function DELETE(
 		}
 
 		const { id } = await params;
-		await cancelInvite(id, user.id);
+		const inviteData = await cancelInvite(id, user.id);
 
 		const clerkClientInstance = await clerkClient();    
 		const clerkUser = await clerkClientInstance.users.getUser(userId);
@@ -36,6 +38,12 @@ export async function DELETE(
                 inviteToken: null,
             },
 		});
+
+		if(inviteData.clerkInvitationId){
+			await clerkClientInstance.invitations.revokeInvitation(inviteData.clerkInvitationId);
+		}
+
+		revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
@@ -94,6 +102,8 @@ export async function POST(
 				console.error("Error resending Clerk invitation:", error);
 			}
 		}
+
+		revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
 
 		return NextResponse.json({ success: true, invite: updatedInvite });
 	} catch (error) {

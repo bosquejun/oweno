@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { createInvite, getInvitesByInviter } from "@/services/inviteService";
 import { getCachedUserById, getUserById } from "@/services/userService";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
 			expiresInDays: expiresInDays || 7,
 		});
 
-		// Create Clerk invitation with redirect URL containing the token
 		let clerkInvitationId: string | undefined;
 		try {
 			
@@ -68,8 +67,7 @@ export async function POST(request: NextRequest) {
 				data: { clerkInvitationId },
 			});
 
-            revalidateTag(CACHE_TAGS.FRIENDS(user.id), {});
-            revalidatePath('/friends')
+            revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
 		} catch (error) {
 			console.error("Error creating Clerk invitation:", error);
 			// Continue without Clerk invitation if it fails

@@ -1,21 +1,25 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { X, Wallet, ArrowRight, Check, Loader2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { Group, User } from '@/generated/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRight, Check, Loader2, X } from 'lucide-react';
+import Image from 'next/image';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useUIStore } from '../../contexts/UIContext';
-import { useAddExpense } from '../../hooks/useSplits';
-import { Group, Debt, SplitType, Expense } from '../../types';
-import { formatCurrency, CURRENCY_SYMBOLS } from '../../utils/formatters';
+import { Debt, Expense, SplitType } from '../../types';
+import { CURRENCY_SYMBOLS } from '../../utils/formatters';
 import { Input } from '../ui/Input';
 
 interface SettleDebtModalProps {
   isOpen: boolean;
   onClose: () => void;
-  group: Group;
+  group: Group & {members: User[]};
   debt?: Debt;
+  user: User;
+  onSuccess?: () => void;
+  expenseId?: string; // For editing existing settlements
+  originalDate?: Date; // Preserve original date when editing
 }
 
 const SettleFormSchema = z.object({
@@ -24,9 +28,7 @@ const SettleFormSchema = z.object({
 
 type SettleFormData = z.infer<typeof SettleFormSchema>;
 
-export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClose, group, debt }) => {
-  const { preferredCurrency, preferredLocale } = useUIStore();
-  const addExpenseMutation = useAddExpense(group.id);
+export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClose, group, debt, user, onSuccess, expenseId, originalDate }) => {
 
   const {
     register,
@@ -50,12 +52,12 @@ export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClos
 
   const onFormSubmit = async (formData: SettleFormData) => {
     const settlementExpense: Expense = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: expenseId || Math.random().toString(36).substr(2, 9),
       groupId: group.id,
-      title: `Settle: ${debtor?.name} paid ${creditor?.name}`,
+      title: `Settle: ${debtor?.displayName} paid ${creditor?.displayName}`,
       amount: formData.amount,
       paidById: debt.from,
-      date: new Date(),
+      date: originalDate || new Date(),
       splitType: SplitType.EXACT,
       category: 'Settlement',
       splits: [
@@ -65,7 +67,18 @@ export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClos
     };
 
     try {
-      await addExpenseMutation.mutateAsync(settlementExpense);
+      const url = expenseId ? `/api/expenses/${expenseId}` : '/api/expenses';
+      const method = expenseId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settlementExpense),
+      });
+      if (!response.ok) {
+        throw new Error(expenseId ? 'Failed to update settlement' : 'Failed to settle debt');
+      }
+      onSuccess?.();
       onClose();
     } catch (e) {
       console.error("Settlement error:", e);
@@ -78,8 +91,8 @@ export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClos
         
         <header className="flex items-center justify-between p-6 md:p-10 border-b border-slate-50 bg-amber-50/20 shrink-0">
           <div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Settle Debt 💰</h2>
-            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mt-1">Record a payment</p>
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{expenseId ? 'Edit Settlement 💰' : 'Settle Debt 💰'}</h2>
+            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mt-1">{expenseId ? 'Update payment record' : 'Record a payment'}</p>
           </div>
           <button onClick={onClose} type="button" className="text-slate-400 hover:text-slate-600 p-2.5 hover:bg-white rounded-xl transition-all shadow-sm">
             <X size={20} />
@@ -89,22 +102,22 @@ export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClos
         <form onSubmit={handleSubmit(onFormSubmit)} className="p-6 md:p-10 space-y-8 flex-1 overflow-y-auto no-scrollbar">
           <div className="flex items-center justify-center gap-6 py-6">
             <div className="flex flex-col items-center gap-3">
-              <img src={debtor?.avatar} className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] border-4 border-amber-100 shadow-lg" alt="" />
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{debtor?.name}</p>
+              <Image unoptimized width={64} height={64} src={debtor?.avatar || ''} className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] border-4 border-amber-100 shadow-lg" alt="" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{debtor?.displayName}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 animate-pulse shrink-0">
               <ArrowRight size={24} />
             </div>
             <div className="flex flex-col items-center gap-3">
-              <img src={creditor?.avatar} className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] border-4 border-emerald-100 shadow-lg" alt="" />
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{creditor?.name}</p>
+              <Image unoptimized width={64} height={64} src={creditor?.avatar || ''} className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] border-4 border-emerald-100 shadow-lg" alt="" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{creditor?.displayName}</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Payment Amount</label>
             <Input
-              prefix={CURRENCY_SYMBOLS[preferredCurrency] || '₱'}
+              prefix={CURRENCY_SYMBOLS[user.preferredCurrency] || '₱'}
               type="number"
               step="0.01"
               placeholder="0.00"
@@ -115,7 +128,7 @@ export const SettleDebtModal: React.FC<SettleDebtModalProps> = ({ isOpen, onClos
 
           <div className="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100">
             <p className="text-[10px] md:text-xs font-bold text-slate-500 leading-relaxed text-center px-2">
-              This records that <span className="text-slate-900 font-black">{debtor?.name}</span> paid <span className="text-slate-900 font-black">{creditor?.name}</span> directly. This balances your books instantly!
+              This records that <span className="text-slate-900 font-black">{debtor?.displayName}</span> paid <span className="text-slate-900 font-black">{creditor?.displayName}</span> directly. This balances your books instantly!
             </p>
           </div>
 

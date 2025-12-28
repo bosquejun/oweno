@@ -1,7 +1,9 @@
+import { CACHE_TAGS } from "@/constants";
 import { addFriend } from "@/services/friendService";
 import { acceptInvite, getInviteByToken } from "@/services/inviteService";
 import { getUserById, upsertUser } from "@/services/userService";
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -79,6 +81,11 @@ export async function POST(
 
 
 		await addFriend(invite.inviterId, user.id);
+
+		revalidateTag(CACHE_TAGS.USER_INVITES(invite.inviterId), {});
+		revalidateTag(CACHE_TAGS.USER_FRIENDS(invite.inviterId), {});
+		revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
+		revalidateTag(CACHE_TAGS.USER_FRIENDS(user.id), {});
 
 		return NextResponse.json({ 
 			success: true,

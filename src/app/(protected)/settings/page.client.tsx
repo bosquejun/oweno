@@ -26,10 +26,10 @@ import { useForm } from "react-hook-form";
 
 const CURRENCIES = [
 	{ code: "PHP", symbol: "₱", label: "Philippine Peso" },
-	{ code: "USD", symbol: "$", label: "US Dollar" },
-	{ code: "EUR", symbol: "€", label: "Euro" },
-	{ code: "JPY", symbol: "¥", label: "Japanese Yen" },
-	{ code: "GBP", symbol: "£", label: "British Pound" },
+	// { code: "USD", symbol: "$", label: "US Dollar" },
+	// { code: "EUR", symbol: "€", label: "Euro" },
+	// { code: "JPY", symbol: "¥", label: "Japanese Yen" },
+	// { code: "GBP", symbol: "£", label: "British Pound" },
 ];
 
 const LOCALES = [{ code: "en-PH", label: "English (Philippines)" }];
@@ -37,7 +37,7 @@ const LOCALES = [{ code: "en-PH", label: "English (Philippines)" }];
 export default function SettingsPage({ user }: { user: User }) {
 	const router = useRouter();
 	const [isRotating, setIsRotating] = useState(false);
-	const { user: clerkUser, isLoaded } = useUser();
+	const { user: clerkUser } = useUser();
 	const [isSaved, setIsSaved] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -50,7 +50,7 @@ export default function SettingsPage({ user }: { user: User }) {
 		formState: { errors, isSubmitting, isDirty },
 	} = useForm<UserType>({
 		resolver: zodResolver(UserSchema),
-		defaultValues: {
+		values: {
 			id: user.id,
 			displayName: user.displayName,
 			email: user.email,
@@ -86,8 +86,6 @@ export default function SettingsPage({ user }: { user: User }) {
 					avatar: data.avatar,
 				}),
 			});
-
-			console.log("Response status:", response.status);
 
 			if (!response.ok) {
 				const errorData = await response.json();

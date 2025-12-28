@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 
 :root {
-
-
   --background: #F8FAFC;
   --foreground: #0f172a;
   --clerk-color-primary: #007956;
@@ -50,16 +50,15 @@
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Dark mode variables - applied when .dark class is on html */
+.dark {
     --background: #0a0a0a;
     --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--foreground) !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   overflow-x: hidden;
 }

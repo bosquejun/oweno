@@ -7,7 +7,6 @@ import { Calendar, Check, Plus, Search, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useCreateGroup, useUpdateGroup } from '../../hooks/useSplits';
 import { Input } from '../ui/Input';
 
 // Extended Group type that includes members
@@ -22,7 +21,7 @@ interface CreateGroupModalProps {
   initialGroup?: GroupWithMembers;
   user: User;
   friends: User[];
-  onSuccess?: () => void;
+  onSuccess?: (groupId: string) => void;
 }
 
 const GroupFormSchema = z.object({
@@ -34,15 +33,13 @@ const GroupFormSchema = z.object({
 
 type GroupFormData = z.infer<typeof GroupFormSchema>;
 
-export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, initialGroup, user, friends }) => {
-  const createGroupMutation = useCreateGroup();
-  const updateGroupMutation = useUpdateGroup();
+export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, initialGroup, user, friends,onSuccess }) => {
   const isEditing = !!initialGroup;
-
   const [members, setMembers] = useState<User[]>([]);
   const [memberSearchQuery, setMemberSearchQuery] = useState('');
   const [isFriendPickerOpen, setIsFriendPickerOpen] = useState(false);
   const friendPickerRef = useRef<HTMLDivElement>(null);
+
 
   const {
     register,
@@ -166,10 +163,27 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
     try {
       let groupId: string;
       if (isEditing) {
-        await updateGroupMutation.mutateAsync(finalData);
-        groupId = finalData.id;
+        
+        const response = await fetch(`/api/groups/${finalData.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(finalData),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update group');
+        }
+        const updatedGroup = await response.json();
+        groupId = updatedGroup.id;
       } else {
-        const createdGroup = await createGroupMutation.mutateAsync(finalData);
+        const response = await fetch('/api/groups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(finalData),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to create group');
+        }
+        const createdGroup = await response.json();
         groupId = createdGroup.id;
       }
 
@@ -192,6 +206,9 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onCl
           })
         );
       }
+
+
+      onSuccess?.(groupId);
 
       onClose();
     } catch (e) {

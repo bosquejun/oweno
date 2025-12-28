@@ -29,8 +29,9 @@ export default async function Page() {
     return <Loading />;
   }
 
-  const groups = await getCachedGroupsByUserId(userId);
-  const friends = await getCachedFriendsListByUserId(userId, {limit: 100, page:1});
+  const groups = await getCachedGroupsByUserId(user.id);
+  const friends = await getCachedFriendsListByUserId(user.id, {limit: 100, page:1});
+
 
   return <ClientPage groups={groups} user={user} friends={friends.data || []} />
 

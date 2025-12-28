@@ -2,7 +2,7 @@
 
 import { useAcceptInvite } from '@/hooks/useInvites';
 import { getInviteByToken } from '@/services/inviteService';
-import { SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
+import { SignInButton, SignOutButton, SignUpButton, useUser } from '@clerk/nextjs';
 import { CheckCircle2, Loader2, Mail, Sparkles, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -204,12 +204,15 @@ export default function InviteAcceptPage({
                 </p>
               </div>
             )}
-            <Link
+            <SignOutButton>
+              <button className="w-full py-3 border-2 border-slate-200 text-slate-700 rounded-2xl font-black hover:bg-slate-50 transition-all text-center">Sign out</button>
+            </SignOutButton>
+            {/* <Link
               href="/dashboard"
               className="block w-full py-3 border-2 border-slate-200 text-slate-700 rounded-2xl font-black hover:bg-slate-50 transition-all text-center"
             >
               Go to Dashboard
-            </Link>
+            </Link> */}
           </div>
         )}
 

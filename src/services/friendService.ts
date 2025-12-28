@@ -2,7 +2,7 @@ import { CACHE_TAGS, FRIENDS_TTL } from "@/constants";
 import { User } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { PaginationParams, PaginationResponse } from "@/types";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { unstable_cache } from "next/cache";
 
 
 /**
@@ -41,9 +41,6 @@ export const addFriend = async (userId: string, friendId: string) => {
     },
   });
 
-  revalidateTag(CACHE_TAGS.FRIENDS(userId), {});
-  revalidateTag(CACHE_TAGS.FRIENDS(friendId), {});
-  revalidatePath("/friends");
 
   // Return the friend user
   return await prisma.user.findUnique({
@@ -66,11 +63,7 @@ export const removeFriend = async (userId: string, friendId: string) => {
       ],
     },
   });
-
-  revalidateTag(CACHE_TAGS.FRIENDS(userId), {});
-  revalidateTag(CACHE_TAGS.FRIENDS(friendId), {});
-  revalidatePath("/friends");
-};
+}
 
 /**
  * Check if two users are friends
@@ -145,15 +138,9 @@ export const getFriendsListByUserId = async (
   };
 };
 
-/**
- * Get cached friends list for a user
- */
-export const getCachedFriendsListByUserId = (userId: string, params: PaginationParams) =>
-  unstable_cache(
-    () => getFriendsListByUserId(userId, params),
-    ["friends", userId, params.page.toString(), params.limit.toString()],
-    {
-      tags: [CACHE_TAGS.FRIENDS(userId)],
-      revalidate: FRIENDS_TTL,
-    }
-  )();
+export const getCachedFriendsListByUserId = async (userId: string, params: PaginationParams) => {
+  return unstable_cache(() => getFriendsListByUserId(userId, params), ["friends", userId, params.page.toString(), params.limit.toString()], {
+    tags: [CACHE_TAGS.USER_FRIENDS(userId)],
+    revalidate: FRIENDS_TTL,
+  })();
+};

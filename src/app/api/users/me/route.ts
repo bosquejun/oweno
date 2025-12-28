@@ -1,6 +1,7 @@
-import { getUserById, upsertUser } from "@/services/userService";
+import { CACHE_TAGS } from "@/constants";
+import { getCachedUserById, upsertUser } from "@/services/userService";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -48,12 +49,7 @@ export async function POST(request: NextRequest) {
 			});
 		}
 
-		// Revalidate the protected layout and settings page to reflect changes
-		revalidatePath("/", "layout");
-		revalidatePath("/settings");
-		// revalidatePath("/dashboard");
-		// revalidatePath("/groups");
-		// revalidatePath("/friends");
+		revalidateTag(CACHE_TAGS.USER(userId), {});
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
@@ -75,7 +71,7 @@ export async function GET() {
 			);
 		}
 
-		const user = await getUserById(userId);
+		const user = await getCachedUserById(userId);
 
 		if (!user) {
 			return NextResponse.json(

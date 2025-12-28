@@ -18,8 +18,13 @@ export const TTL = {
 
 export const CACHE_TAGS = {
 	USER: (userId: string) => `user-${userId}`,
-	FRIENDS: (userId: string) => `friends-${userId}`,
+	USER_FRIENDS: (userId: string) => `user-friends-${userId}`,
+	USER_INVITES: (userId: string) => `user-invites-${userId}`,
+	USER_GROUPS: (userId: string) => `user-groups-${userId}`,
+	USER_EXPENSES: (userId: string) => `user-expenses-${userId}`,
 	GROUP: (groupId: string) => `group-${groupId}`,
+	GROUP_EXPENSES: (groupId: string) => `group-expenses-${groupId}`,
+	INVITE: (token: string) => `invite-${token}`,
 	EXPENSE: (expenseId: string) => `expense-${expenseId}`,
 	SPLIT: (splitId: string) => `split-${splitId}`,
 };
@@ -27,3 +32,4 @@ export const CACHE_TAGS = {
 export const USER_TTL = TTL.FIFTEEN_MINUTES;
 export const FRIENDS_TTL = TTL.ONE_DAY;
 export const GROUPS_TTL = TTL.ONE_DAY;
+export const INVITE_TTL = TTL.ONE_DAY;

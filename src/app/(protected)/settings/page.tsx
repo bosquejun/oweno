@@ -20,13 +20,13 @@ export default async function SettingsPage() {
 	const { userId } = await auth();
 
 
-	console.log(userId)
 
 	if (!userId) {
 		return <Loading />;
 	}
 
 	const user = await getCachedUserById(userId);
+
 
 	if (!user) {
 		return <Loading />;

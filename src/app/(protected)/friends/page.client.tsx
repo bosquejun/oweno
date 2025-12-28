@@ -4,6 +4,7 @@ import { User } from '@/generated/prisma/client';
 import { PaginationResponse } from '@/types';
 import { CheckCircle2, Clock, Copy, Heart, Mail, Plus, Search, X } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 
 type Tab = 'friends' | 'invited';
@@ -44,11 +45,12 @@ type InviteFromDB = {
 export default function FriendsList({ data: friends = [], total, page, limit, invitedFriends }: PaginationResponse<User> & {
     invitedFriends: InviteFromDB[];
 }) {
-  
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('friends');
   const [searchQuery, setSearchQuery] = useState('');
   const [newFriendEmail, setNewFriendEmail] = useState('');
   const [isAdding, setIsAdding] = useState(false);
+
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFriendEmail || !newFriendEmail.includes('@')) return;
@@ -68,7 +70,8 @@ export default function FriendsList({ data: friends = [], total, page, limit, in
         }
 
         const data = await response.json();
-        console.log(data);
+        
+        router.refresh();
     } catch (error) {
       console.error('Error adding friend:', error);
     }

@@ -173,16 +173,27 @@ export default function LandingPage() {
       </section>
 
       <footer className="bg-white py-12 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-black text-xs">O</div>
-            <span className="font-black text-slate-900">OweNo</span>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-black text-xs">O</div>
+              <span className="font-black text-slate-900">OweNo</span>
+            </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">© 2024 OweNo Philippines. Gawa ng Barkada para sa Barkada.</p>
+            <div className="flex gap-6">
+              <Star size={16} className="text-slate-200" />
+              <Star size={16} className="text-slate-200" />
+              <Star size={16} className="text-slate-200" />
+            </div>
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">© 2024 OweNo Philippines. Gawa ng Barkada para sa Barkada.</p>
-          <div className="flex gap-6">
-            <Star size={16} className="text-slate-200" />
-            <Star size={16} className="text-slate-200" />
-            <Star size={16} className="text-slate-200" />
+          <div className="flex flex-wrap items-center justify-center gap-6 pt-8 border-t border-slate-100">
+            <Link href="/privacy" className="text-[10px] font-black text-slate-400 hover:text-emerald-600 uppercase tracking-widest transition-colors">
+              Privacy Policy
+            </Link>
+            <span className="text-slate-200">•</span>
+            <Link href="/terms" className="text-[10px] font-black text-slate-400 hover:text-emerald-600 uppercase tracking-widest transition-colors">
+              Terms of Service
+            </Link>
           </div>
         </div>
       </footer>

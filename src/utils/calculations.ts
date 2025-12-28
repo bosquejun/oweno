@@ -1,27 +1,47 @@
 
-import { Expense, Debt, Balance, User } from '../types';
+import { DetailedExpense } from '@/app/(protected)/groups/[id]/page.client';
+import { User } from '@/generated/prisma/client';
+import { Balance, Debt } from '../types';
 
 /**
  * Calculates net balances for all members in a group based on expenses.
  */
-export const calculateBalances = (members: User[], expenses: Expense[]): Balance[] => {
+export const calculateBalances = (members: User[], expenses: DetailedExpense[]): Balance[] => {
   const balances: Record<string, number> = {};
+  const userIdsInExpenses = new Set<string>();
   
-  members.forEach(m => (balances[m.id] = 0));
+  // Initialize balances for all members
+  members.forEach(m => {
+    balances[m.id] = 0;
+    userIdsInExpenses.add(m.id);
+  });
 
   expenses.forEach((expense) => {
+    // Track all user IDs involved in expenses
+    userIdsInExpenses.add(expense.paidById);
+    expense.splits.forEach((split) => {
+      userIdsInExpenses.add(split.userId);
+    });
+    
     // Paid by person gets credit
+    if (!balances[expense.paidById]) {
+      balances[expense.paidById] = 0;
+    }
     balances[expense.paidById] += expense.amount;
     
     // Each person in the split owes their part
     expense.splits.forEach((split) => {
+      if (!balances[split.userId]) {
+        balances[split.userId] = 0;
+      }
       balances[split.userId] -= split.amount;
     });
   });
 
-  return members.map(m => ({
-    userId: m.id,
-    net: balances[m.id]
+  // Return balances for all members (including those not in original members array)
+  return Array.from(userIdsInExpenses).map(userId => ({
+    userId,
+    net: balances[userId] || 0
   }));
 };
 

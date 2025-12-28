@@ -24,9 +24,9 @@ export const Layout: React.FC<{
 	const [isSigningOut, setIsSigningOut] = useState(false);
 
 	const navItems = [
-		{ path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-		{ path: "/groups", icon: Users, label: "My Groups" },
-		{ path: "/friends", icon: UserCheck, label: "My Barkada" },
+		{ path: "/dashboard", icon: LayoutDashboard, label: "Dashboard", prefetch:false },
+		{ path: "/groups", icon: Users, label: "My Groups", prefetch:true },
+		{ path: "/friends", icon: UserCheck, label: "My Barkada", prefetch:true },
 	];
 
 	const handleSignOut = async () => {
@@ -38,9 +38,9 @@ export const Layout: React.FC<{
 	// User is managed by Clerk, no need to sync to UI store
 
 	return (
-		<div className='flex flex-col md:flex-row h-screen bg-[#F8FAFC] overflow-hidden relative'>
+		<div className='flex flex-col md:flex-row h-screen bg-[#F8FAFC] dark:bg-slate-900 overflow-hidden relative'>
 			{/* Sidebar - Desktop */}
-			<aside className='hidden md:flex flex-col w-72 h-full bg-white border-r border-slate-100 px-8 py-10 z-20 shrink-0'>
+			<aside className='hidden md:flex flex-col w-72 h-full bg-white dark:bg-slate-800 border-r border-slate-100 dark:border-slate-700 px-8 py-10 z-20 shrink-0'>
 				<div className='px-2 mb-12'>
 					<Link href='/' className='flex items-center gap-4 group'>
 						<div className='w-11 h-11 bg-emerald-600 rounded-[1rem] flex items-center justify-center text-white shadow-xl shadow-emerald-100 group-hover:rotate-6 transition-transform'>
@@ -63,6 +63,7 @@ export const Layout: React.FC<{
 					</p>
 					{navItems.map((item) => (
 						<Link
+						prefetch={item.prefetch}
 							key={item.path}
 							href={item.path}
 							className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 ${
@@ -83,6 +84,9 @@ export const Layout: React.FC<{
 				</nav>
 
 				<div className='mt-auto space-y-6 pt-10'>
+					{/* <div className='flex items-center gap-2 px-2'>
+						<ThemeToggle />
+					</div> */}
 					<Link
 						href='/settings'
 						className={`w-full bg-slate-50/80 hover:bg-slate-100 rounded-[1.5rem] p-5 border border-slate-100/50 backdrop-blur-sm transition-all group/profile flex items-center gap-4 ${
@@ -138,7 +142,7 @@ export const Layout: React.FC<{
 			</aside>
 
 			{/* Main content area */}
-			<main className='flex-1 h-full overflow-y-auto scroll-smooth bg-[#F8FAFC]'>
+			<main className='flex-1 h-full overflow-y-auto scroll-smooth bg-[#F8FAFC] dark:bg-slate-900'>
 				<div className='max-w-7xl mx-auto pb-32 md:pb-16 pt-0 md:pt-10 px-6 md:px-12'>
 					{children}
 				</div>
@@ -148,6 +152,7 @@ export const Layout: React.FC<{
 			<nav className='md:hidden fixed bottom-4 left-4 right-4 bg-slate-900/95 backdrop-blur-lg rounded-3xl border border-white/10 flex justify-around items-center py-4 px-4 z-40 shadow-2xl'>
 				{navItems.map((item) => (
 					<Link
+					prefetch={item.prefetch}
 						key={item.path}
 						href={item.path}
 						className={`flex flex-col items-center gap-1 transition-all ${

@@ -1,5 +1,7 @@
+import { CACHE_TAGS, INVITE_TTL } from "@/constants";
 import { InviteStatus } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 import { addFriend } from "./friendService";
 
 export interface CreateInviteInput {
@@ -100,6 +102,13 @@ export const getInviteByToken = async (token: string)=> {
   return invite;
 };
 
+export const getCachedInviteByToken = async (token: string) => {
+  return unstable_cache(() => getInviteByToken(token), ["invite", token], {
+    tags: [CACHE_TAGS.INVITE(token)],
+    revalidate: INVITE_TTL,
+  })();
+};
+
 export const acceptInvite = async (token: string, inviteeId: string) => {
   const invite = await getInviteByToken(token);
 
@@ -186,6 +195,13 @@ export const getInvitesByInviter = async (inviterId: string) => {
     },
     orderBy: { createdAt: "desc" },
   });
+};
+
+export const getCachedInvitesByInviter = async (inviterId: string) => {
+  return unstable_cache(() => getInvitesByInviter(inviterId), ["invites", inviterId], {
+    tags: [CACHE_TAGS.USER_INVITES(inviterId)],
+    revalidate: INVITE_TTL,
+  })();
 };
 
 export const cancelInvite = async (inviteId: string, inviterId: string) => {
