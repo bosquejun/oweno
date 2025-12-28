@@ -1,5 +1,4 @@
 import { CACHE_TAGS, INVITE_TTL } from "@/constants";
-import { InviteStatus } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 import { addFriend } from "./friendService";
@@ -34,7 +33,7 @@ export const createInvite = async (input: CreateInviteInput) => {
   const existingInvite = await prisma.invite.findFirst({
     where: {
       email: input.email,
-      status: InviteStatus.PENDING,
+      status: "PENDING",
       groupId: validGroupId,
       expiresAt: {
         gt: new Date(),
@@ -53,7 +52,7 @@ export const createInvite = async (input: CreateInviteInput) => {
       groupId: validGroupId,
       expiresAt,
       clerkInvitationId: input.clerkInvitationId,
-      status: InviteStatus.PENDING,
+      status: "PENDING",
     },
     include: {
       inviter: {
@@ -91,12 +90,12 @@ export const getInviteByToken = async (token: string)=> {
   }
 
   // Check if expired
-  if (invite.expiresAt && invite.expiresAt < new Date() && invite.status === InviteStatus.PENDING) {
+  if (invite.expiresAt && invite.expiresAt < new Date() && invite.status === "PENDING") {
     await prisma.invite.update({
       where: { id: invite.id },
-      data: { status: InviteStatus.EXPIRED },
+      data: { status: "EXPIRED" },
     });
-    return { ...invite, status: InviteStatus.EXPIRED };
+    return { ...invite, status: "EXPIRED" };
   }
 
   return invite;
@@ -116,16 +115,16 @@ export const acceptInvite = async (token: string, inviteeId: string) => {
     throw new Error("Invite not found");
   }
 
-  if(invite.status === InviteStatus.ACCEPTED){
+  if(invite.status === "ACCEPTED"){
     return invite;
-  }else if (invite.status !== InviteStatus.PENDING) {
+  }else if (invite.status !== "PENDING") {
     throw new Error(`Invite is ${invite.status.toLowerCase()}`);
   }
 
   if (invite.expiresAt && invite.expiresAt < new Date()) {
     await prisma.invite.update({
       where: { id: invite.id },
-      data: { status: InviteStatus.EXPIRED },
+      data: { status: "EXPIRED" },
     });
     throw new Error("Invite has expired");
   }
@@ -134,7 +133,7 @@ export const acceptInvite = async (token: string, inviteeId: string) => {
   const updatedInvite = await prisma.invite.update({
     where: { id: invite.id },
     data: {
-      status: InviteStatus.ACCEPTED,
+      status: "ACCEPTED",
       inviteeId,
       acceptedAt: new Date(),
     },
@@ -209,7 +208,7 @@ export const cancelInvite = async (inviteId: string, inviterId: string) => {
     where: {
       id: inviteId,
       inviterId,
-      status: InviteStatus.PENDING,
+      status: "PENDING",
     },
   });
 
@@ -219,7 +218,7 @@ export const cancelInvite = async (inviteId: string, inviterId: string) => {
 
   return prisma.invite.update({
     where: { id: inviteId },
-    data: { status: InviteStatus.CANCELLED },
+    data: { status: "CANCELLED" },
   });
 };
 
@@ -242,7 +241,7 @@ export const resendInvite = async (inviteId: string, inviterId: string, clerkInv
     data: {
       expiresAt: newExpiresAt,
       clerkInvitationId: clerkInvitationId || invite.clerkInvitationId,
-      status: InviteStatus.PENDING,
+      status: "PENDING",
     },
   });
 };

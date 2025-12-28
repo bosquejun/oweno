@@ -1,4 +1,3 @@
-import { InviteStatus } from "@/generated/prisma/client";
 import { getInviteByToken } from "@/services/inviteService";
 import { auth } from "@clerk/nextjs/server";
 import InviteAcceptPage from "./page.client";
@@ -11,7 +10,7 @@ export default async function InvitePage({
 	const { token } = await params;
 	const invite = await getInviteByToken(token);
 
-	if (!invite || [InviteStatus.EXPIRED, InviteStatus.CANCELLED].includes(invite.status as any)) {
+	if (!invite || ["EXPIRED", "CANCELLED"].includes(invite.status as any)) {
 		return (
 			<div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-6">
 				<div className="bg-white rounded-3xl p-8 max-w-md w-full text-center border border-slate-100 shadow-xl">
