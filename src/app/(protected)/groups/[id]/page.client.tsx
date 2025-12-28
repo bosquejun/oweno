@@ -85,7 +85,7 @@ export default function GroupDetail({group, user, friends, expenses =[]}:{group:
     <>
       <div className="page-transition">
         <header className="sticky top-0 z-30 -mx-6 px-6 pt-8 pb-4 bg-[#F8FAFC]/90 backdrop-blur-xl flex flex-row items-center justify-between gap-4 mb-6 md:mb-10">
-          <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+          <div className="flex items-center gap-3 md:gap-4 overflow-hidden px-0 md:px-4 ">
             <Link href="/groups" className="p-2 -ml-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all shrink-0">
               <ArrowLeft size={22} />
             </Link>

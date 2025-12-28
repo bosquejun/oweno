@@ -20,7 +20,7 @@ export default function LandingPage() {
           
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest transition-colors">Features</a>
-            <a href="#testimonials" className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest transition-colors">Reviews</a>
+            {/* <a href="#testimonials" className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest transition-colors">Reviews</a> */}
           </div>
 
           <div className="flex items-center gap-4">
@@ -62,12 +62,12 @@ export default function LandingPage() {
           </h1>
           
           <p className="max-w-2xl mx-auto text-slate-500 text-lg md:text-xl font-medium mb-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
-            Track staycations, group dinners, and shared expenses instantly. <br className="hidden md:block" />
-            Designed to avoid those awkward “Sino nagbayad?” moments, OweNo makes splitting bills simple, transparent, and drama-free.
+            Designed to avoid those awkward “Sino nagbayad, bes?” moments, OweNo makes splitting bills simple, transparent, and drama-free.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-12 duration-700">
-            <SignUpButton mode='modal' forceRedirectUrl="/dashboard">
+           <SignedOut>
+           <SignUpButton mode='modal' forceRedirectUrl="/dashboard">
             <div 
 
               className="cursor-pointer w-full sm:w-auto px-10 py-5 bg-emerald-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-700 hover:scale-105 transition-all shadow-2xl shadow-emerald-200 flex items-center justify-center gap-3 group"
@@ -76,11 +76,23 @@ export default function LandingPage() {
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </div>
             </SignUpButton>
+           </SignedOut>
+           <SignedIn>
+            <Link href="/dashboard" className="text-xs font-black text-slate-600 hover:text-emerald-600 transition-colors uppercase tracking-widest">
+            <div 
+
+className="cursor-pointer w-full sm:w-auto px-10 py-5 bg-emerald-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-700 hover:scale-105 transition-all shadow-2xl shadow-emerald-200 flex items-center justify-center gap-3 group"
+>
+Get Started
+<ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+</div>
+</Link>
+           </SignedIn>
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map(i => (
                 <img 
                   key={i} 
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i*123}`} 
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i*123}&backgroundColor=b6e3f4`} 
                   className="w-10 h-10 rounded-full border-2 border-white shadow-sm" 
                   alt="" 
                 />
@@ -162,6 +174,7 @@ export default function LandingPage() {
           <Heart size={48} className="text-rose-500 mx-auto mb-8 animate-pulse" />
           <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">OweNo one today.</h2>
           <p className="text-slate-400 text-lg mb-12">Join 50,000+ Filipinos splitting bills the OweNo way.</p>
+          <SignedOut>
           <SignUpButton mode="modal">
           <button 
             className="cursor-pointer px-12 py-6 bg-emerald-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-500 hover:scale-105 transition-all shadow-2xl"
@@ -169,6 +182,16 @@ export default function LandingPage() {
             Create Your Free Account
           </button>
           </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <Link href="/dashboard" className="text-xs font-black text-slate-600 hover:text-emerald-600 transition-colors uppercase tracking-widest">
+            <button 
+            className="cursor-pointer px-12 py-6 bg-emerald-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-500 hover:scale-105 transition-all shadow-2xl"
+          >
+            Get Started
+          </button>
+            </Link>
+          </SignedIn>
         </div>
       </section>
 

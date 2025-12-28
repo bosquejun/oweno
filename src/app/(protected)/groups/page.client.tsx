@@ -3,7 +3,7 @@
 import { CreateGroupModal } from '@/components/modals/CreateGroupModal';
 import { Group, User } from '@/generated/prisma/client';
 import { format } from 'date-fns';
-import { Calendar, ChevronRight, Heart, Plus, Search } from 'lucide-react';
+import { Calendar, ChevronRight, Heart, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -37,7 +37,7 @@ export default function GroupsList({groups = [], friends = [], user}: {groups: G
         </header>
 
         <div className="space-y-6 md:space-y-8">
-          <div className="relative group">
+          {/* <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
             <input
               type="text"
@@ -46,7 +46,7 @@ export default function GroupsList({groups = [], friends = [], user}: {groups: G
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-5 py-3.5 md:py-4 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 placeholder:text-slate-400 text-sm"
             />
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {groups.map((group) => {

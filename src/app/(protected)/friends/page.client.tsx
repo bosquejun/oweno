@@ -2,7 +2,7 @@
 
 import { User } from '@/generated/prisma/client';
 import { PaginationResponse } from '@/types';
-import { CheckCircle2, Clock, Copy, Heart, Mail, Plus, Search, X } from 'lucide-react';
+import { CheckCircle2, Clock, Copy, Heart, Mail, Plus, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
@@ -200,7 +200,7 @@ export default function FriendsList({ data: friends = [], total, page, limit, in
         )}
 
         {/* Search */}
-        <div className="relative group">
+        {/* <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
           <input
             type="text"
@@ -209,7 +209,7 @@ export default function FriendsList({ data: friends = [], total, page, limit, in
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-5 py-3.5 md:py-4 bg-white border border-slate-100 rounded-2xl shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 placeholder:text-slate-400 text-sm"
           />
-        </div>
+        </div> */}
 
         {/* Friends Tab Content */}
         {activeTab === 'friends' && (
