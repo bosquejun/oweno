@@ -1,4 +1,4 @@
-import { InviteStatus } from "@/generated/prisma/enums";
+import { InviteStatus } from "@/generated/prisma/client";
 import { getInviteByToken } from "@/services/inviteService";
 import { auth } from "@clerk/nextjs/server";
 import InviteAcceptPage from "./page.client";
