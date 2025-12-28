@@ -14,20 +14,14 @@ export async function POST(
 		const { userId } = await auth();
 
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const { token } = await params;
 		const invite = await getInviteByToken(token);
 
 		if (!invite) {
-			return NextResponse.json(
-				{ error: "Invite not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "Invite not found" }, { status: 404 });
 		}
 
 		if (invite.status !== "PENDING") {
@@ -55,30 +49,23 @@ export async function POST(
 		}
 
 		if (!user) {
-			return NextResponse.json(
-				{ error: "Failed to create user" },
-				{ status: 500 }
-			);
+			return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
 		}
 
 		// Verify email matches invite
 		if (user.email.toLowerCase() !== invite.email.toLowerCase()) {
-			return NextResponse.json(
-				{ error: "Email does not match invite" },
-				{ status: 400 }
-			);
+			return NextResponse.json({ error: "Email does not match invite" }, { status: 400 });
 		}
 
 		// Accept invite
 		await acceptInvite(token, user.id);
-		
+
 		await clerkClientInstance.users.updateUser(userId, {
 			publicMetadata: {
 				...clerkUser.publicMetadata,
 				inviteToken: null,
 			},
 		});
-
 
 		await addFriend(invite.inviterId, user.id);
 
@@ -87,12 +74,12 @@ export async function POST(
 		revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
 		revalidateTag(CACHE_TAGS.USER_FRIENDS(user.id), {});
 
-		return NextResponse.json({ 
+		return NextResponse.json({
 			success: true,
 			groupId: invite.groupId,
-			message: invite.groupId 
-				? `You've been added to ${invite.group?.name || "the group"}!` 
-				: "Invite accepted successfully!"
+			message: invite.groupId
+				? `You've been added to ${invite.group?.name || "the group"}!`
+				: "Invite accepted successfully!",
 		});
 	} catch (error) {
 		console.error("Error accepting invite:", error);
@@ -102,4 +89,3 @@ export async function POST(
 		);
 	}
 }
-

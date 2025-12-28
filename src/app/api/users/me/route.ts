@@ -9,22 +9,13 @@ export async function POST(request: NextRequest) {
 		const { userId } = await auth();
 
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const client = await clerkClient();
 
 		const body = await request.json();
-		const {
-			onboardingComplete,
-			displayName,
-			preferredCurrency,
-			preferredLocale,
-			avatar,
-		} = body;
+		const { onboardingComplete, displayName, preferredCurrency, preferredLocale, avatar } = body;
 
 		// Get current user to preserve existing metadata
 		const user = await client.users.getUser(userId);
@@ -54,10 +45,7 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error("Error updating user metadata:", error);
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 }
-		);
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 	}
 }
 
@@ -65,27 +53,18 @@ export async function GET() {
 	try {
 		const { userId } = await auth();
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const user = await getCachedUserById(userId);
 
 		if (!user) {
-			return NextResponse.json(
-				{ error: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "User not found" }, { status: 404 });
 		}
 
 		return NextResponse.json(user);
 	} catch (error) {
 		console.error("Error getting user:", error);
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 }
-		);
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 	}
 }

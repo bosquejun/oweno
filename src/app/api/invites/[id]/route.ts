@@ -13,33 +13,27 @@ export async function DELETE(
 		const { userId } = await auth();
 
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const user = await getUserById(userId);
 		if (!user) {
-			return NextResponse.json(
-				{ error: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "User not found" }, { status: 404 });
 		}
 
 		const { id } = await params;
 		const inviteData = await cancelInvite(id, user.id);
 
-		const clerkClientInstance = await clerkClient();    
+		const clerkClientInstance = await clerkClient();
 		const clerkUser = await clerkClientInstance.users.getUser(userId);
 		await clerkClientInstance.users.updateUser(userId, {
 			publicMetadata: {
 				...clerkUser.publicMetadata,
-                inviteToken: null,
-            },
+				inviteToken: null,
+			},
 		});
 
-		if(inviteData.clerkInvitationId){
+		if (inviteData.clerkInvitationId) {
 			await clerkClientInstance.invitations.revokeInvitation(inviteData.clerkInvitationId);
 		}
 
@@ -55,26 +49,17 @@ export async function DELETE(
 	}
 }
 
-export async function POST(
-	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { userId } = await auth();
 
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const user = await getUserById(userId);
 		if (!user) {
-			return NextResponse.json(
-				{ error: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "User not found" }, { status: 404 });
 		}
 
 		const { id } = await params;
@@ -95,7 +80,7 @@ export async function POST(
 						groupId: updatedInvite.groupId || null,
 					},
 				} as any);
-				
+
 				// Update with new Clerk invitation ID
 				await resendInvite(id, user.id, clerkInvitation.id);
 			} catch (error) {
@@ -114,4 +99,3 @@ export async function POST(
 		);
 	}
 }
-

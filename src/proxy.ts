@@ -15,7 +15,6 @@ export default clerkMiddleware(async (auth, req) => {
 	const isOnboarding = isOnboardingRoute(req);
 	const isInvite = isInviteRoute(req);
 
-
 	// Allow API routes to proceed without onboarding checks
 	if (isApi) {
 		return NextResponse.next();
@@ -34,24 +33,20 @@ export default clerkMiddleware(async (auth, req) => {
 	// Catch users who do not have `onboardingComplete: true` in their publicMetadata
 	// Redirect them to the /onboarding route to complete onboarding
 	// But skip this check for API routes (already handled above)
-	if (
-		isAuthenticated &&
-		!sessionClaims?.metadata?.onboardingComplete &&
-		!isApi
-	) {
+	if (isAuthenticated && !sessionClaims?.metadata?.onboardingComplete && !isApi) {
 		const onboardingUrl = new URL("/onboarding", req.url);
 		return NextResponse.redirect(onboardingUrl);
 	}
 
 	// Handle invite token logic for authenticated users who completed onboarding
 	if (isAuthenticated && sessionClaims?.metadata?.onboardingComplete) {
-		const {inviteToken} = sessionClaims?.metadata;
+		const { inviteToken } = sessionClaims?.metadata;
 
 		// Case 1: User has inviteToken in metadata and is NOT on invite page -> redirect to invite page
 		if (inviteToken && !isInvite) {
 			const inviteUrl = new URL(`/invite/${inviteToken}`, req.url);
 			return NextResponse.redirect(inviteUrl);
-		} 
+		}
 
 		// Case 2: User has NO inviteToken in metadata but is on an invite page -> redirect to dashboard
 		if (!inviteToken && isInvite) {

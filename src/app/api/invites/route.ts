@@ -11,28 +11,19 @@ export async function POST(request: NextRequest) {
 		const { userId } = await auth();
 
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const user = await getCachedUserById(userId);
 		if (!user) {
-			return NextResponse.json(
-				{ error: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "User not found" }, { status: 404 });
 		}
 
 		const body = await request.json();
 		const { email, groupId, expiresInDays } = body;
 
 		if (!email || !email.includes("@")) {
-			return NextResponse.json(
-				{ error: "Valid email is required" },
-				{ status: 400 }
-			);
+			return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
 		}
 
 		// Check if user already exists
@@ -48,7 +39,6 @@ export async function POST(request: NextRequest) {
 
 		let clerkInvitationId: string | undefined;
 		try {
-			
 			const clerkInvitation = await clerkClientInstance.invitations.createInvitation({
 				emailAddress: email,
 				expiresInDays: expiresInDays || 7,
@@ -57,7 +47,7 @@ export async function POST(request: NextRequest) {
 					invitedBy: user.id,
 					groupId: groupId || null,
 					inviteToken: invite.token, // Store token in metadata as backup
-				}
+				},
 			});
 			clerkInvitationId = clerkInvitation.id;
 
@@ -67,7 +57,7 @@ export async function POST(request: NextRequest) {
 				data: { clerkInvitationId },
 			});
 
-            revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
+			revalidateTag(CACHE_TAGS.USER_INVITES(user.id), {});
 		} catch (error) {
 			console.error("Error creating Clerk invitation:", error);
 			// Continue without Clerk invitation if it fails
@@ -88,18 +78,12 @@ export async function GET(request: NextRequest) {
 		const { userId } = await auth();
 
 		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthorized" },
-				{ status: 401 }
-			);
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const user = await getUserById(userId);
 		if (!user) {
-			return NextResponse.json(
-				{ error: "User not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "User not found" }, { status: 404 });
 		}
 
 		const invites = await getInvitesByInviter(user.id);
@@ -107,10 +91,6 @@ export async function GET(request: NextRequest) {
 		return NextResponse.json(invites);
 	} catch (error) {
 		console.error("Error fetching invites:", error);
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 }
-		);
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 	}
 }
-

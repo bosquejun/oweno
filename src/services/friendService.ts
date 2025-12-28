@@ -4,48 +4,46 @@ import prisma from "@/lib/prisma";
 import { PaginationParams, PaginationResponse } from "@/types";
 import { unstable_cache } from "next/cache";
 
-
 /**
  * Add a friend relationship between two users (bidirectional)
  * @param userId - The ID of the user adding the friend
  * @param friendId - The ID of the user being added as a friend
  */
 export const addFriend = async (userId: string, friendId: string) => {
-  // Prevent self-friending
-  if (userId === friendId) {
-    throw new Error("Cannot add yourself as a friend");
-  }
+	// Prevent self-friending
+	if (userId === friendId) {
+		throw new Error("Cannot add yourself as a friend");
+	}
 
-  // Check if friendship already exists (in either direction)
-  const existingFriendship = await prisma.friend.findFirst({
-    where: {
-      OR: [
-        { userId, friendId },
-        { userId: friendId, friendId: userId }, // Check reverse direction
-      ],
-    },
-  });
+	// Check if friendship already exists (in either direction)
+	const existingFriendship = await prisma.friend.findFirst({
+		where: {
+			OR: [
+				{ userId, friendId },
+				{ userId: friendId, friendId: userId }, // Check reverse direction
+			],
+		},
+	});
 
-  if (existingFriendship) {
-    // Friendship already exists, return the friend
-    return await prisma.user.findUnique({
-      where: { id: friendId },
-    });
-  }
+	if (existingFriendship) {
+		// Friendship already exists, return the friend
+		return await prisma.user.findUnique({
+			where: { id: friendId },
+		});
+	}
 
-  // Create friendship record
-  await prisma.friend.create({
-    data: {
-      userId,
-      friendId,
-    },
-  });
+	// Create friendship record
+	await prisma.friend.create({
+		data: {
+			userId,
+			friendId,
+		},
+	});
 
-
-  // Return the friend user
-  return await prisma.user.findUnique({
-    where: { id: friendId },
-  });
+	// Return the friend user
+	return await prisma.user.findUnique({
+		where: { id: friendId },
+	});
 };
 
 /**
@@ -54,16 +52,16 @@ export const addFriend = async (userId: string, friendId: string) => {
  * @param friendId - The ID of the friend being removed
  */
 export const removeFriend = async (userId: string, friendId: string) => {
-  // Delete friendship in both directions
-  await prisma.friend.deleteMany({
-    where: {
-      OR: [
-        { userId, friendId },
-        { userId: friendId, friendId: userId },
-      ],
-    },
-  });
-}
+	// Delete friendship in both directions
+	await prisma.friend.deleteMany({
+		where: {
+			OR: [
+				{ userId, friendId },
+				{ userId: friendId, friendId: userId },
+			],
+		},
+	});
+};
 
 /**
  * Check if two users are friends
@@ -71,16 +69,16 @@ export const removeFriend = async (userId: string, friendId: string) => {
  * @param friendId - Second user ID
  */
 export const areFriends = async (userId: string, friendId: string): Promise<boolean> => {
-  const friendship = await prisma.friend.findFirst({
-    where: {
-      OR: [
-        { userId, friendId },
-        { userId: friendId, friendId: userId },
-      ],
-    },
-  });
+	const friendship = await prisma.friend.findFirst({
+		where: {
+			OR: [
+				{ userId, friendId },
+				{ userId: friendId, friendId: userId },
+			],
+		},
+	});
 
-  return !!friendship;
+	return !!friendship;
 };
 
 /**
@@ -89,58 +87,56 @@ export const areFriends = async (userId: string, friendId: string): Promise<bool
  * @param params - Pagination parameters
  */
 export const getFriendsListByUserId = async (
-  userId: string,
-  params: PaginationParams
+	userId: string,
+	params: PaginationParams
 ): Promise<PaginationResponse<User>> => {
-  // Get total count
-  const total = await prisma.friend.count({
-    where: {
-      OR: [
-        { userId },
-        { friendId: userId },
-      ],
-    },
-  });
+	// Get total count
+	const total = await prisma.friend.count({
+		where: {
+			OR: [{ userId }, { friendId: userId }],
+		},
+	});
 
-  // Get friends with pagination
-  const friendships = await prisma.friend.findMany({
-    where: {
-      OR: [
-        { userId },
-        { friendId: userId },
-      ],
-    },
-    include: {
-      user: true,
-      friend: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    skip: (params.page - 1) * params.limit,
-    take: params.limit,
-  });
+	// Get friends with pagination
+	const friendships = await prisma.friend.findMany({
+		where: {
+			OR: [{ userId }, { friendId: userId }],
+		},
+		include: {
+			user: true,
+			friend: true,
+		},
+		orderBy: {
+			createdAt: "desc",
+		},
+		skip: (params.page - 1) * params.limit,
+		take: params.limit,
+	});
 
-  // Map friendships to User objects
-  const friends = friendships.map((friendship: any) => {
-    // Return the other user (not the current user)
-    return friendship.userId === userId ? friendship.friend : friendship.user;
-  });
+	// Map friendships to User objects
+	const friends = friendships.map((friendship: any) => {
+		// Return the other user (not the current user)
+		return friendship.userId === userId ? friendship.friend : friendship.user;
+	});
 
-  // Sort by displayName
-  friends.sort((a: User, b: User) => a.displayName.localeCompare(b.displayName));
+	// Sort by displayName
+	friends.sort((a: User, b: User) => a.displayName.localeCompare(b.displayName));
 
-  return {
-    data: friends,
-    total,
-    page: params.page,
-    limit: params.limit,
-  };
+	return {
+		data: friends,
+		total,
+		page: params.page,
+		limit: params.limit,
+	};
 };
 
 export const getCachedFriendsListByUserId = async (userId: string, params: PaginationParams) => {
-  return unstable_cache(() => getFriendsListByUserId(userId, params), ["friends", userId, params.page.toString(), params.limit.toString()], {
-    tags: [CACHE_TAGS.USER_FRIENDS(userId)],
-    revalidate: FRIENDS_TTL,
-  })();
+	return unstable_cache(
+		() => getFriendsListByUserId(userId, params),
+		["friends", userId, params.page.toString(), params.limit.toString()],
+		{
+			tags: [CACHE_TAGS.USER_FRIENDS(userId)],
+			revalidate: FRIENDS_TTL,
+		}
+	)();
 };

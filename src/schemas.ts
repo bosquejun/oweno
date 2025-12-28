@@ -2,9 +2,7 @@ import { z } from "zod";
 
 export const UserSchema = z.object({
 	id: z.string(),
-	displayName: z
-		.string()
-		.min(2, "Display name must be at least 2 characters long"),
+	displayName: z.string().min(2, "Display name must be at least 2 characters long"),
 	email: z.string().email("Invalid email address"),
 	avatar: z.string().url().optional(),
 	preferredCurrency: z.string().optional(),

@@ -18,10 +18,7 @@ export const getCachedUserById = (userId: string) =>
 		revalidate: USER_TTL,
 	})();
 
-export const upsertUser = async (
-	userId: string,
-	data: Omit<UserCreateInput, "clerkId">
-) => {
+export const upsertUser = async (userId: string, data: Omit<UserCreateInput, "clerkId">) => {
 	const user = await getUserById(userId);
 
 	if (!user) {
@@ -45,4 +42,3 @@ export const upsertUser = async (
 
 	revalidateTag(CACHE_TAGS.USER(userId), {});
 };
-

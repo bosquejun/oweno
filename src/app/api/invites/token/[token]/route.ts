@@ -12,10 +12,7 @@ export async function GET(
 		const invite = await getCachedInviteByToken(token);
 
 		if (!invite) {
-			return NextResponse.json(
-				{ error: "Invite not found" },
-				{ status: 404 }
-			);
+			return NextResponse.json({ error: "Invite not found" }, { status: 404 });
 		}
 
 		revalidateTag(CACHE_TAGS.INVITE(token), {});
@@ -31,10 +28,6 @@ export async function GET(
 		});
 	} catch (error) {
 		console.error("Error fetching invite:", error);
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 }
-		);
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 	}
 }
-
