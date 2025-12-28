@@ -2,6 +2,7 @@
 
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { ArrowRight, Globe, Heart, Receipt, ShieldCheck, Sparkles, Star, Users, Zap } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
@@ -11,12 +12,18 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-100">
-              <span className="font-black text-lg">O</span>
-            </div>
-            <span className="text-xl font-black text-slate-900 tracking-tight">OweNah</span>
+            <Image 
+                src="/logo.png"
+                alt="OweNah"
+                width={54}
+                height={54}
+                className="w-14 h-14"
+              />
+            <span className="text-xl font-black text-slate-900 tracking-tight hidden md:block"><span className='text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500'>Owe</span>Nah</span>
           </div>
+          </Link>
           
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest transition-colors">Features</a>
@@ -53,7 +60,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Sparkles size={16} className="text-emerald-500" />
-            <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em]">Owenah stress, bes! 🇵🇭</span>
+            <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em]">OweNah stress, bes! 🇵🇭</span>
           </div>
           
           <h1 className="text-5xl md:text-8xl font-black text-slate-900 tracking-tighter mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -198,11 +205,19 @@ Get Started
       <footer className="bg-white py-12 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-black text-xs">O</div>
-              <span className="font-black text-slate-900">Owenah</span>
-            </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">© 2024 Owenah Philippines. Gawa ng Barkada para sa Barkada.</p>
+          <Link href="/">
+          <div className="flex items-center gap-3">
+            <Image 
+                src="/logo.png"
+                alt="OweNah"
+                width={54}
+                height={54}
+                className="w-14 h-14"
+              />
+            <span className="text-xl font-black text-slate-900 tracking-tight"><span className='text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500'>Owe</span>Nah</span>
+          </div>
+          </Link>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">© 2025 OweNah Philippines. Gawa ng Barkada para sa Barkada.</p>
             <div className="flex gap-6">
               <Star size={16} className="text-slate-200" />
               <Star size={16} className="text-slate-200" />

@@ -43,9 +43,7 @@ export const Layout: React.FC<{
 			<aside className='hidden md:flex flex-col w-72 h-full bg-white dark:bg-slate-800 border-r border-slate-100 dark:border-slate-700 px-8 py-10 z-20 shrink-0'>
 				<div className='px-2 mb-12'>
 					<Link href='/' className='flex items-center gap-4 group'>
-						<div className='w-11 h-11 bg-emerald-600 rounded-[1rem] flex items-center justify-center text-white shadow-xl shadow-emerald-100 group-hover:rotate-6 transition-transform'>
-							<span className='font-black text-xl'>O</span>
-						</div>
+						<Image  src="/logo.png" alt="OweNah" width={54} height={54} className="w-14 h-14" />
 						<div>
 							<h1 className='text-2xl font-black text-slate-900 tracking-tight leading-none'>
 								OweNah
