@@ -108,7 +108,7 @@ export default function OnboardingPage() {
 							<span className='font-black text-2xl'>O</span>
 						</div>
 						<h1 className='text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-3'>
-							Welcome to OweNo!
+							Welcome to OweNah!
 						</h1>
 						<p className='text-slate-500 font-medium text-sm md:text-base'>
 							Let&apos;s get you set up

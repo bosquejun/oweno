@@ -19,7 +19,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Initialize theme from localStorage or default to light
   useEffect(() => {
-    const stored = localStorage.getItem('oweno-theme') as Theme | null;
+    const stored = localStorage.getItem('owenah-theme') as Theme | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) {
       setThemeState(stored);
     }
@@ -63,7 +63,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem('oweno-theme', newTheme);
+    localStorage.setItem('owenah-theme', newTheme);
   };
 
   // Prevent flash of wrong theme

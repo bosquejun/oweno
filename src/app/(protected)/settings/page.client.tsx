@@ -146,7 +146,7 @@ export default function SettingsPage({ user }: { user: User }) {
 							Settings ⚙️
 						</h1>
 						<p className='text-sm md:text-base text-slate-500 font-medium mt-1'>
-							Customize your OweNo experience
+							Customize your OweNah experience
 						</p>
 					</div>
 				</div>

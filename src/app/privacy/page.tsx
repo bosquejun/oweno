@@ -1,10 +1,17 @@
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - OweNo",
-  description: "OweNo Privacy Policy - How we protect and handle your data",
+  title: "Privacy Policy - OweNah",
+  description: "OweNah Privacy Policy - How we protect and handle your data",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Privacy Policy - OweNah",
+    description: "OweNah Privacy Policy - How we protect and handle your data",
+  },
 };
 
 export default function PrivacyPolicyPage() {
@@ -38,7 +45,7 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-xl font-black text-slate-900 mb-4">1. Introduction</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                Welcome to OweNo ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our expense tracking application.
+                Welcome to Owenah ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our expense tracking application.
               </p>
             </section>
 

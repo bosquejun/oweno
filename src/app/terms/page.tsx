@@ -1,10 +1,17 @@
+import { ArrowLeft, FileText } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - OweNo",
-  description: "OweNo Terms of Service - Rules and guidelines for using our platform",
+  title: "Terms of Service - OweNah",
+  description: "Owenah Terms of Service - Rules and guidelines for using our platform",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Terms of Service - OweNah",
+    description: "OweNah Terms of Service - Rules and guidelines for using our platform",
+  },
 };
 
 export default function TermsOfServicePage() {
@@ -38,14 +45,14 @@ export default function TermsOfServicePage() {
             <section>
               <h2 className="text-xl font-black text-slate-900 mb-4">1. Acceptance of Terms</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                By accessing or using OweNo ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Service.
+                By accessing or using Owenah ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Service.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-black text-slate-900 mb-4">2. Description of Service</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                OweNo is an expense tracking and bill-splitting application that allows users to create groups, track shared expenses, calculate balances, and manage settlements between group members.
+                Owenah is an expense tracking and bill-splitting application that allows users to create groups, track shared expenses, calculate balances, and manage settlements between group members.
               </p>
             </section>
 
@@ -96,13 +103,13 @@ export default function TermsOfServicePage() {
                 <div>
                   <h3 className="text-lg font-black text-slate-800 mb-2">5.1 Accuracy of Data</h3>
                   <p className="text-slate-700 font-medium leading-relaxed">
-                    You are solely responsible for the accuracy of all expense and financial information you enter into the Service. OweNo is a tracking tool and does not verify the accuracy of your financial data.
+                    You are solely responsible for the accuracy of all expense and financial information you enter into the Service. Owenah is a tracking tool and does not verify the accuracy of your financial data.
                   </p>
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-slate-800 mb-2">5.2 No Financial Services</h3>
                   <p className="text-slate-700 font-medium leading-relaxed">
-                    OweNo is not a financial institution, payment processor, or money transmitter. We do not hold, transfer, or process payments. The Service only tracks and calculates expenses and balances between users.
+                    Owenah is not a financial institution, payment processor, or money transmitter. We do not hold, transfer, or process payments. The Service only tracks and calculates expenses and balances between users.
                   </p>
                 </div>
                 <div>
@@ -141,7 +148,7 @@ export default function TermsOfServicePage() {
             <section>
               <h2 className="text-xl font-black text-slate-900 mb-4">7. Intellectual Property</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                The Service and its original content, features, and functionality are owned by OweNo and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of the Service without our prior written consent.
+                The Service and its original content, features, and functionality are owned by Owenah and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of the Service without our prior written consent.
               </p>
             </section>
 
@@ -155,14 +162,14 @@ export default function TermsOfServicePage() {
             <section>
               <h2 className="text-xl font-black text-slate-900 mb-4">9. Limitation of Liability</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                TO THE MAXIMUM EXTENT PERMITTED BY LAW, OWENO SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES RESULTING FROM YOUR USE OF THE SERVICE.
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, OWENAH SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES RESULTING FROM YOUR USE OF THE SERVICE.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-black text-slate-900 mb-4">10. Indemnification</h2>
               <p className="text-slate-700 font-medium leading-relaxed">
-                You agree to indemnify and hold harmless OweNo, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of or relating to your use of the Service, violation of these Terms, or infringement of any rights of another.
+                You agree to indemnify and hold harmless Owenah, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of or relating to your use of the Service, violation of these Terms, or infringement of any rights of another.
               </p>
             </section>
 

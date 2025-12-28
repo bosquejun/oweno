@@ -94,7 +94,7 @@ export default function InviteAcceptPage({
             <CheckCircle2 size={40} className="text-emerald-600" strokeWidth={2.5} />
           </div>
           <h1 className="text-2xl font-black text-slate-900 mb-4">
-            Welcome to OweNo! 🎉
+            Welcome to OweNah! 🎉
           </h1>
           <p className="text-slate-600 mb-6">
             {invite.groupId 
@@ -118,7 +118,7 @@ export default function InviteAcceptPage({
             You're Invited! 🎉
           </h1>
           <p className="text-slate-500 font-medium">
-            {invite.inviter.displayName} invited you to join OweNo
+            {invite.inviter.displayName} invited you to join Owenah
           </p>
         </div>
 

@@ -48,10 +48,10 @@ export const Layout: React.FC<{
 						</div>
 						<div>
 							<h1 className='text-2xl font-black text-slate-900 tracking-tight leading-none'>
-								OweNo
+								OweNah
 							</h1>
 							<p className='text-[9px] font-black text-emerald-500 uppercase tracking-tight leading-none mt-2'>
-								Split the bills. OweNo one.
+								Split the bills. OweNah one.
 							</p>
 						</div>
 					</Link>

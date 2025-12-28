@@ -9,8 +9,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "OweNo - Split the bills. OweNo one.",
-  description: "Track staycations, group dinners, and shared expenses instantly. Join thousands of barkadas splitting bills without the drama.",
+  title: "OweNah - Split the bills. OweNah one.",
+  description: "Designed to avoid those awkward \"Sino nagbayad, bes?\" moments, OweNah makes splitting bills simple, transparent, and drama-free.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "OweNah - Split the bills. OweNah one.",
+    description: "Designed to avoid those awkward \"Sino nagbayad, bes?\" moments, OweNah makes splitting bills simple, transparent, and drama-free.",
+  },
 };
 
 export default function RootLayout({

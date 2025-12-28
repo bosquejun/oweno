@@ -177,7 +177,7 @@ export default function FriendsList({ data: friends = [], total, page, limit, in
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <h2 className="text-lg font-black tracking-tight mb-1">Add to Barkada</h2>
-                <p className="text-emerald-100 text-xs font-bold">Invite a friend to OweNo by their email.</p>
+                <p className="text-emerald-100 text-xs font-bold">Invite a friend to OweNah by their email.</p>
               </div>
               <form onSubmit={handleQuickAdd} className="flex gap-2 w-full md:w-auto">
                 <input 

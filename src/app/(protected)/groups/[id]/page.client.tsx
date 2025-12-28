@@ -58,8 +58,8 @@ export default function GroupDetail({group, user, friends, expenses =[]}:{group:
 
   const handleShare = async () => {
     const shareData = {
-      title: `Join ${group.name} on OweNo`,
-      text: `Let's split our expenses for "${group.name}" using OweNo! 💸`,
+      title: `Join ${group.name} on Owenah`,
+      text: `Let's split our expenses for "${group.name}" using Owenah! 💸`,
       url: window.location.href,
     };
 

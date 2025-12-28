@@ -1,6 +1,6 @@
-# OweNo Database Schema (Prisma)
+# Owenah Database Schema (Prisma)
 
-This document describes the data model for the OweNo expense-splitting application in Prisma Schema Language (PSL).
+This document describes the data model for the Owenah expense-splitting application in Prisma Schema Language (PSL).
 
 ```prisma
 datasource db {
@@ -107,7 +107,7 @@ enum SplitType {
 
 ## Data Mapping Notes
 
-| OweNo Type | Prisma Type | Description |
+| Owenah Type | Prisma Type | Description |
 |------------|-------------|-------------|
 | `User` | `User` | Maps directly. Email is unique for auth. |
 | `Group` | `Group` | `members` is handled via an implicit many-to-many table. |

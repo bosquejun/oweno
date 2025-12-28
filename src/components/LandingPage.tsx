@@ -15,7 +15,7 @@ export default function LandingPage() {
             <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-100">
               <span className="font-black text-lg">O</span>
             </div>
-            <span className="text-xl font-black text-slate-900 tracking-tight">OweNo</span>
+            <span className="text-xl font-black text-slate-900 tracking-tight">OweNah</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
@@ -53,16 +53,16 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Sparkles size={16} className="text-emerald-500" />
-            <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em]">OweNo stress, bes! 🇵🇭</span>
+            <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em]">Owenah stress, bes! 🇵🇭</span>
           </div>
           
           <h1 className="text-5xl md:text-8xl font-black text-slate-900 tracking-tighter mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-8 duration-700">
             Split the bills. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">OweNo one.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">OweNah one.</span>
           </h1>
           
           <p className="max-w-2xl mx-auto text-slate-500 text-lg md:text-xl font-medium mb-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
-            Designed to avoid those awkward “Sino nagbayad, bes?” moments, OweNo makes splitting bills simple, transparent, and drama-free.
+            Designed to avoid those awkward "Sino nagbayad, bes?" moments, OweNah makes splitting bills simple, transparent, and drama-free.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-12 duration-700">
@@ -128,7 +128,7 @@ Get Started
       <section id="features" className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-6">Split the bills. OweNo one.</h2>
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-6">Split the bills. Owenah one.</h2>
             <p className="text-slate-500 font-medium max-w-xl mx-auto">Everything you need to keep your barkada's finance drama-free and your friendships intact.</p>
           </div>
 
@@ -172,8 +172,8 @@ Get Started
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/20 blur-[120px] rounded-full -mr-48 -mt-48"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <Heart size={48} className="text-rose-500 mx-auto mb-8 animate-pulse" />
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">OweNo one today.</h2>
-          <p className="text-slate-400 text-lg mb-12">Join 50,000+ Filipinos splitting bills the OweNo way.</p>
+          <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">Owenah one today.</h2>
+          <p className="text-slate-400 text-lg mb-12">Join 50,000+ Filipinos splitting bills the Owenah way.</p>
           <SignedOut>
           <SignUpButton mode="modal">
           <button 
@@ -200,9 +200,9 @@ Get Started
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-black text-xs">O</div>
-              <span className="font-black text-slate-900">OweNo</span>
+              <span className="font-black text-slate-900">Owenah</span>
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">© 2024 OweNo Philippines. Gawa ng Barkada para sa Barkada.</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">© 2024 Owenah Philippines. Gawa ng Barkada para sa Barkada.</p>
             <div className="flex gap-6">
               <Star size={16} className="text-slate-200" />
               <Star size={16} className="text-slate-200" />

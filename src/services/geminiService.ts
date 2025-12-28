@@ -27,7 +27,7 @@ export const getSmartSettleInsights = async (
   }).join(', ');
 
   const prompt = `
-    Analyze this expense group in the app "OweNo": "${group.name}".
+    Analyze this expense group in the app "OweNah": "${group.name}".
     Currency: ${currencyCode} (${symbol})
     Expenses: ${expenseContext || 'None yet'}
     Calculated Debts: ${debtContext || 'None'}
