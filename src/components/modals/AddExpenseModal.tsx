@@ -3,13 +3,12 @@
 import { DetailedExpense } from '@/app/(protected)/groups/[id]/page.client';
 import { Group, User } from '@/generated/prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
 import { AlertCircle, Calendar, Check, CheckCircle2, ChevronDown, Film, HeartPulse, Home, MoreHorizontal, Plane, Search, ShoppingBag, Tag, Utensils, X, Zap } from 'lucide-react';
 import Image from 'next/image';
-import { format } from 'date-fns';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useUpdateExpense } from '../../hooks/useSplits';
 import { Expense, Split, SplitType } from '../../types';
 import { CURRENCY_SYMBOLS, formatCurrency } from '../../utils/formatters';
 import { Input } from '../ui/Input';
@@ -43,7 +42,6 @@ const ExpenseFormSchema = z.object({
 type ExpenseFormData = z.infer<typeof ExpenseFormSchema>;
 
 export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClose, group, initialExpense, onSuccess, user }) => {
-  const updateExpenseMutation = useUpdateExpense(group?.id || '');
   const isEditing = !!initialExpense;
 
   const [paidBy, setPaidBy] = useState(user?.id || '');

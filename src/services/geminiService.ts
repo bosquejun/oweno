@@ -1,11 +1,12 @@
 'use client';
 
+import { Group, User } from "@/generated/prisma/client";
 import { GoogleGenAI } from "@google/genai";
-import { Expense, Group, Debt } from "../types";
+import { Debt, Expense } from "../types";
 import { CURRENCY_SYMBOLS } from "../utils/formatters";
 
 export const getSmartSettleInsights = async (
-  group: Group, 
+  group: Group & {members: User[]}, 
   expenses: Expense[], 
   debts: Debt[],
   currencyCode: string = 'PHP'
@@ -20,8 +21,8 @@ export const getSmartSettleInsights = async (
   
   const expenseContext = expenses.map(e => `${e.title}: ${symbol}${e.amount.toLocaleString()}`).join(', ');
   const debtContext = debts.map(d => {
-    const from = group.members.find(m => m.id === d.from)?.name;
-    const to = group.members.find(m => m.id === d.to)?.name;
+    const from = group.members.find(m => m.id === d.from)?.displayName;
+    const to = group.members.find(m => m.id === d.to)?.displayName;
     return `${from} owes ${to} ${symbol}${d.amount.toLocaleString()}`;
   }).join(', ');
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { useAcceptInvite } from '@/hooks/useInvites';
 import { getInviteByToken } from '@/services/inviteService';
 import { SignInButton, SignOutButton, SignUpButton, useUser } from '@clerk/nextjs';
 import { CheckCircle2, Loader2, Mail, Sparkles, Users } from 'lucide-react';
@@ -19,7 +18,6 @@ export default function InviteAcceptPage({
 }) {
   const router = useRouter();
   const { user, isLoaded } = useUser();
-  const acceptInviteMutation = useAcceptInvite();
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -182,20 +180,10 @@ export default function InviteAcceptPage({
             {user?.emailAddresses[0]?.emailAddress.toLowerCase() === invite.email.toLowerCase() ? (
               <button
                 onClick={handleAccept}
-                disabled={acceptInviteMutation.isPending}
                 className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
               >
-                {acceptInviteMutation.isPending ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    <span>Accepting...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 size={20} strokeWidth={3} />
-                    <span>Accept Invitation</span>
-                  </>
-                )}
+               <CheckCircle2 size={20} strokeWidth={3} />
+               <span>Accept Invitation</span>
               </button>
             ) : (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">

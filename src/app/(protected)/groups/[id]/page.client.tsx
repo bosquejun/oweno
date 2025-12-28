@@ -4,7 +4,6 @@ import { AddExpenseModal } from '@/components/modals/AddExpenseModal';
 import { CreateGroupModal } from '@/components/modals/CreateGroupModal';
 import { SettleDebtModal } from '@/components/modals/SettleDebtModal';
 import { Group, User } from '@/generated/prisma/client';
-import { useAddFriend } from '@/hooks/useSplits';
 import { CATEGORY_STYLES } from '@/lib/category-styles';
 import { getCachedExpensesByGroupId } from '@/services/expenseService';
 import { getSmartSettleInsights } from '@/services/geminiService';
@@ -22,7 +21,7 @@ import { useState } from 'react';
 export type DetailedExpense = Awaited<ReturnType<typeof getCachedExpensesByGroupId>>[number];
 
 export default function GroupDetail({group, user, friends, expenses =[]}:{group: Group & {members: User[]}, user: User, friends: User[], expenses: DetailedExpense[]}) {
-  const addFriendMutation = useAddFriend();
+
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
@@ -346,12 +345,6 @@ export default function GroupDetail({group, user, friends, expenses =[]}:{group:
                     </div>
                     {member.id !== user.id && (
                       <button
-                        onClick={async () => {
-                          if (!isFriend(member.id)) {
-                            await addFriendMutation.mutate(member);
-                            // await refetchFriends();
-                          }
-                        }}
                         disabled={isFriend(member.id)}
                         className={`p-2 rounded-lg transition-all ${
                           isFriend(member.id) 

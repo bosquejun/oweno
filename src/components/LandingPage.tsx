@@ -63,7 +63,7 @@ export default function LandingPage() {
           
           <p className="max-w-2xl mx-auto text-slate-500 text-lg md:text-xl font-medium mb-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
             Track staycations, group dinners, and shared expenses instantly. <br className="hidden md:block" />
-            Join thousands of barkadas splitting bills without the drama.
+            Designed to avoid those awkward “Sino nagbayad?” moments, OweNo makes splitting bills simple, transparent, and drama-free.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-12 duration-700">
